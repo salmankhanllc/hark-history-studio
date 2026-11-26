@@ -1,4 +1,4 @@
-# Test Report — Hark History Studio, Local Backend Edition
+# Test Report — History Studio, Local Backend Edition
 
 All tests below were **actually run** on 2026-11-26 on this machine
 (Linux, Python 3.12.3, FFmpeg 8.1.2). Nothing here is simulated.
@@ -121,3 +121,26 @@ Test project "FALL OF DUNKIRK / GREAT ESCAPE IS OVER / JUNE 4, 1940",
 - The 63 MB Piper voice ships in the zip but **not** on GitHub (the
   GitHub contents API rejects files that large); the README gives the
   one-link download for repo users.
+
+## Rebrand — "Hark" removed (2026-11-26)
+
+At the owner's order, the product is now simply **History Studio**. All
+user-visible "Hark" branding was removed: app title (API health now
+reports "History Studio — Local Backend"), page <title> and masthead,
+production-sheet header/footer, download file-name prefixes
+(`history-studio-…`), README/report headers, and the install.bat /
+start.bat titles and echo text. The standalone portable page and the
+GitHub repository were renamed the same way (repo: `history-studio`).
+
+Internal identifiers were intentionally kept so saved data and code keep
+working: the SQLite file name (`projects/hark_studio.db`), the
+`HARK_HOST` / `HARK_PORT` / `HARK_MAX_UPLOAD_MB` environment variables,
+browser localStorage keys (`hark_portable_*`), `window.hark*` JS hooks,
+and `hark.*` logger names. None of these are shown to users.
+
+Re-verified after the rename from a fresh extraction of the rebuilt zip
+(`history-studio-local.zip`): new venv, both requirements files
+installed, server started with start.bat's uvicorn command — health OK,
+frontend HTTP 200, masthead reads "HISTORY STUDIO", no "hark" in the
+served page's visible text, and tests/smoke_test.py passed (health,
+system status, Piper ready, template script generation: 6 scenes / 25 s).
