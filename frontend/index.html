@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
+<title>Hark History Studio — Portable Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&amp;family=Archivo:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0906; --bg2:#100e09; --panel:#16130c; --panel2:#1c1810; --line:#2e281a; --line2:#453b22;
+  --gold:#c9a227; --gold2:#e8c766; --gold-dim:#8a742a; --ink:#ece5d3; --ink2:#b8ae94; --ink3:#857c62;
+  --red:#d96a5a; --green:#7fb069; --radius:10px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;font-size:15.5px;line-height:1.55}
+button,[role="button"],select,input,textarea{font:inherit}
+button,select,input:not([type="radio"]),textarea{min-height:44px}
+a{color:var(--gold2)}
+h1,h2,h3{font-family:'Cinzel',serif;margin:0;line-height:1.15}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* Masthead */
+.masthead{border-bottom:3px double var(--gold-dim);background:linear-gradient(180deg,#171307,#0a0906);padding:26px 20px 20px;text-align:center}
+.masthead .rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);max-width:760px;margin:0 auto}
+.masthead h1{font-size:clamp(26px,5.4vw,46px);font-weight:900;letter-spacing:.06em;color:#f4ecd4;margin:12px 0 4px}
+.masthead h1 .gold{color:var(--gold2)}
+.mast-top{display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line2);color:var(--gold2);padding:5px 10px;border-radius:999px}
+.badge.solid{background:var(--gold);color:#171204;border-color:var(--gold);font-weight:600}
+.tagline{font-style:italic;color:var(--ink2);max-width:640px;margin:10px auto 12px;font-size:16px}
+.mast-meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase}
+
+/* Tabs */
+.tabs{position:sticky;top:0;z-index:30;background:rgba(10,9,6,.96);border-bottom:1px solid var(--line);display:flex;justify-content:center;gap:4px;padding:8px 10px;flex-wrap:wrap}
+.tab-btn{background:transparent;border:1px solid transparent;color:var(--ink2);padding:10px 22px;min-height:44px;border-radius:8px;cursor:pointer;font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:13.5px}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{background:var(--panel2);border-color:var(--line2);color:var(--gold2)}
+.tab-btn .count{background:var(--gold);color:#171204;border-radius:999px;font-size:11px;padding:1px 7px;margin-left:6px;font-weight:700}
+
+.wrap{max-width:1120px;margin:0 auto;padding:22px 16px 40px}
+section.page{display:none}
+section.page.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card h2{font-size:20px;color:#f4ecd4;margin-bottom:6px}
+.card h3{font-size:15px;font-family:'Archivo',sans-serif;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gold2);margin:18px 0 8px}
+.card p.sub{color:var(--ink2);margin:0 0 14px;font-size:14.5px}
+label.flabel{display:block;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:14px 0 6px}
+input[type="text"],input[type="password"],select,textarea{width:100%;background:#0d0b07;border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:10px 12px}
+input[type=file]{max-width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold-dim);outline-offset:1px;border-color:var(--gold)}
+textarea{resize:vertical;min-height:64px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#171204;border:1px solid var(--gold);font-weight:700;padding:11px 20px;border-radius:8px;cursor:pointer;min-height:44px;text-decoration:none}
+.btn:hover{background:var(--gold2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--gold2);border-color:var(--line2)}
+.btn.ghost:hover{border-color:var(--gold);background:var(--panel2)}
+.btn.danger{background:transparent;color:var(--red);border-color:#5a322b}
+.btn.small{padding:7px 13px;min-height:38px;font-size:13.5px}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.statusline{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink2);margin-top:8px;min-height:18px}
+.statusline.ok{color:var(--green)} .statusline.err{color:var(--red)}
+.keyrow{display:flex;gap:8px;align-items:flex-end}
+.keyrow .grow{flex:1}
+.masked{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green)}
+ul.tight{margin:8px 0;padding-left:20px;color:var(--ink2)}
+ul.tight li{margin-bottom:7px}
+ul.tight strong{color:var(--ink)}
+.steps{counter-reset:st;list-style:none;padding:0;margin:10px 0}
+.steps li{counter-increment:st;position:relative;padding:10px 0 10px 46px;border-bottom:1px dashed var(--line);color:var(--ink2)}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(st);position:absolute;left:0;top:8px;width:32px;height:32px;border:1px solid var(--gold-dim);border-radius:50%;color:var(--gold2);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:700}
+.steps li strong{color:var(--ink);display:block}
+.stylepanel{background:#0d0b07;border:1px solid var(--line2);border-left:4px solid var(--gold);border-radius:8px;padding:16px}
+.stylepanel dl{display:grid;grid-template-columns:130px 1fr;gap:6px 14px;margin:0;font-size:14.5px}
+.stylepanel dt{font-weight:700;color:var(--gold2);text-transform:uppercase;font-size:12px;letter-spacing:.07em;padding-top:2px}
+.stylepanel dd{margin:0;color:var(--ink)}
+@media(max-width:560px){.stylepanel dl{grid-template-columns:1fr}.stylepanel dd{margin-bottom:8px}}
+.empty{border:1px dashed var(--line2);border-radius:8px;padding:22px;text-align:center;color:var(--ink3)}
+
+/* Presets */
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+@media(max-width:820px){.presets{grid-template-columns:1fr}}
+.preset{display:block;border:1px solid var(--line2);border-radius:8px;padding:14px;cursor:pointer;background:#0d0b07;min-height:44px}
+.preset input{position:absolute;opacity:0}
+.preset:has(input:checked){border-color:var(--gold);background:#1d1809;box-shadow:0 0 0 1px var(--gold)}
+.preset .pname{font-weight:700;color:#f4ecd4;display:block}
+.preset .pmodel{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gold2);display:block;margin:2px 0 6px}
+.preset .pdesc{font-size:13.5px;color:var(--ink2);display:block}
+
+/* Scenes */
+.scene{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:0;margin-bottom:16px;overflow:hidden}
+.scene-head{display:flex;gap:14px;align-items:flex-start;padding:16px 18px 10px}
+.snum{font-family:'Cinzel',serif;font-weight:900;font-size:26px;color:var(--gold);border:1px solid var(--line2);border-radius:8px;width:52px;height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:center;background:#0d0b07}
+.scene-head h3{font-family:'Cinzel',serif;font-size:18px;text-transform:none;letter-spacing:0;color:#f4ecd4;margin:0}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;border:1px solid var(--line2);border-radius:999px;padding:3px 9px;color:var(--ink2);text-transform:uppercase}
+.chip.firing{border-color:#7a4a20;color:#eda55c}.chip.impact{border-color:#7a2e26;color:#ef8a7a}.chip.aftermath{border-color:#3d5a34;color:#9cc98d}
+.chip.vstat{color:var(--ink3)} .chip.vstat.ready{color:var(--green);border-color:#33512c}.chip.vstat.busy{color:var(--gold2);border-color:var(--gold-dim)}.chip.vstat.failed{color:var(--red);border-color:#5a322b}
+.scene-body{padding:0 18px 18px}
+.scene-body h4{margin:16px 0 6px;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--gold2)}
+.promptbox{background:#0d0b07;border:1px solid var(--line);border-radius:8px;padding:13px 14px;font-size:14px;color:var(--ink);white-space:pre-wrap}
+.narr{font-style:italic;color:var(--ink2);border-left:3px solid var(--gold-dim);padding:4px 0 4px 12px;margin:6px 0}
+.srclinks{display:flex;flex-wrap:wrap;gap:7px}
+.srclinks a{display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border:1px solid var(--line2);border-radius:999px;color:var(--ink);text-decoration:none;font-size:13px;background:#0d0b07}
+.srclinks a:hover{border-color:var(--gold);color:var(--gold2)}
+.recipe{list-style:none;padding:0;margin:6px 0;counter-reset:rc}
+.recipe li{counter-increment:rc;padding:7px 0 7px 34px;position:relative;color:var(--ink2);font-size:14px;border-bottom:1px dashed #241f13}
+.recipe li:last-child{border-bottom:none}
+.recipe li::before{content:"✓";position:absolute;left:0;top:6px;width:24px;height:24px;border-radius:50%;background:#22301b;color:#a9d18e;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.recipe li strong{color:var(--ink)}
+.video-slot{margin-top:12px}
+.video-slot video{width:100%;max-height:420px;background:#000;border-radius:8px;border:1px solid var(--line2)}
+details.more{margin-top:10px}
+details.more summary{cursor:pointer;color:var(--gold2);font-weight:600;min-height:36px;display:flex;align-items:center}
+
+/* Preview */
+.preview-grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+@media(max-width:820px){.preview-grid{grid-template-columns:1fr}.phone{margin:0 auto}}
+.phone{width:300px;max-width:88vw;aspect-ratio:9/16;background:#000;border:1px solid var(--line2);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pbar-top{height:26.2%;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px 12px;gap:5px;border-bottom:1px solid #1c1a14}
+.pwin{height:47.7%;background:#191510;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pwin video{width:100%;height:100%;object-fit:cover}
+.pwin .placeholder{color:var(--ink3);font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:center;padding:14px}
+.pbar-bot{flex:1;background:#000}
+.pt-l1{font-family:'Archivo',sans-serif;font-weight:800;color:#fff;font-size:19px;letter-spacing:.03em;text-transform:uppercase;line-height:1.15}
+.pt-l2{color:var(--gold2);font-weight:700;font-size:14.5px;text-transform:uppercase;letter-spacing:.03em}
+.pt-l3{color:#d8d2c0;font-family:'IBM Plex Mono',monospace;font-size:12px;text-transform:uppercase;min-height:16px}
+.checklist{list-style:none;padding:0;margin:8px 0}
+.checklist li{padding:9px 0 9px 36px;position:relative;border-bottom:1px dashed var(--line);color:var(--ink2)}
+.checklist li:last-child{border-bottom:none}
+.checklist li::before{content:"○";position:absolute;left:2px;top:8px;font-size:17px;color:var(--ink3)}
+.checklist li.pass{color:var(--ink)} .checklist li.pass::before{content:"✓";color:var(--green);font-weight:700}
+.checklist li .note{display:block;font-size:13px;color:var(--ink3)}
+
+/* Library */
+.lib-item{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;flex-wrap:wrap}
+.lib-item .grow{flex:1;min-width:220px}
+.lib-item h3{font-size:17px;color:#f4ecd4}
+.lib-item .meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink3);margin-top:4px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);background:#221c0d;border:1px solid var(--gold-dim);color:var(--ink);padding:12px 20px;border-radius:10px;z-index:60;transition:transform .25s;max-width:92vw;text-align:center;font-size:14.5px}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{border-top:1px solid var(--line);padding:20px 16px 30px;text-align:center;color:var(--ink3);font-size:13.5px}
+footer .fnote{max-width:680px;margin:0 auto}
+.progress{height:8px;background:#0d0b07;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.progress i{display:block;height:100%;background:var(--gold);width:0%}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mast-top">
+    <span class="badge solid">Portable Edition</span>
+    <span class="badge">Version 1.0</span>
+    <span class="badge">Archive-First Studio</span>
+  </div>
+  <div class="rule" style="margin-top:16px"></div>
+  <h1>HARK <span class="gold">HISTORY</span> STUDIO</h1>
+  <p class="tagline">“Every history video should feel like it was shot by the people who lived it.”</p>
+  <div class="rule"></div>
+  <p class="mast-meta" style="margin:12px 0 0">Style-locked scenes · Firing → impact · Combat sound only · 9:16 vertical</p>
+</header>
+
+<nav class="tabs" aria-label="Studio sections">
+  <button class="tab-btn active" data-tab="setup">Setup</button>
+  <button class="tab-btn" data-tab="create">Create</button>
+  <button class="tab-btn" data-tab="library">Library <span class="count" id="libCount">0</span></button>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ SETUP ============ -->
+<section class="page active" id="page-setup">
+  <div class="grid2">
+    <div class="card">
+      <h2>Local Backend</h2>
+      <p class="sub">This edition runs on the free local Python backend — no API keys, no accounts, no cloud. Start it with <span class="mono">start.bat</span> in the studio folder; this page then talks to it on this machine only.</p>
+      <div id="backendPanel"><div class="statusline">Checking for the local backend…</div></div>
+      <div class="btnrow">
+        <button class="btn ghost" id="recheckBackend" type="button">Re-check Backend</button>
+      </div>
+      <div class="statusline" id="backendMsg" role="status"></div>
+    </div>      <div class="statusline" id="saveMsg" role="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>Reference Style</h2>
+      <p class="sub">Every scene prompt is locked to one reference style, so a whole reel looks like a single film — never a mix of random generations.</p>
+      <div class="btnrow" style="margin:0 0 14px">
+        <button class="btn" id="loadTemplate" type="button">Load Battle of Britain Template</button>
+        <button class="btn ghost" id="clearStyle" type="button">Clear Style</button>
+      </div>
+      <div id="stylePanel"><div class="empty">No style loaded yet.<br>Load the template, then go to Create.</div></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Why This Isn't a Generic History Video</h2>
+      <ul class="tight">
+        <li><strong>One locked look.</strong> Period colour, film grain and lighting rules are written into every single prompt — clips match each other.</li>
+        <li><strong>Firing → impact, always.</strong> A gun firing is followed immediately by its destruction. No filler, no slow scenic shots.</li>
+        <li><strong>Real sound only.</strong> Each scene carries a combat sound cue synced to the picture — no narration, no music bed.</li>
+        <li><strong>Archive first.</strong> Real archival footage from free sources, enhanced with the studio recipe, beats fake-looking AI footage — this studio uses no AI video generation at all; every clip is real footage you choose.</li>
+        <li><strong>The locked title format.</strong> Three title lines in the top black bar only — L1 at 0s, L2 (gold) at ~7s, L3 typewriter at ~15.5s. Titles never touch the footage.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>How It Works</h2>
+      <ol class="steps">
+        <li><strong>Load the style</strong>Battle of Britain template above — era, palette, grain and format.</li>
+        <li><strong>Create the breakdown</strong>Topic, hook and date in Create. Scenes are written style-locked, firing → impact, aftermath last.</li>
+        <li><strong>Find each clip</strong>Use the 9 free archive links per scene, download the real archival clip, then upload it onto its scene card in Create.</li>
+        <li><strong>Enhance &amp; assemble</strong>Follow the 8-step recipe per scene, check the Reel Preview and Quality Checklist, then export the Production Sheet or render the final MP4 with the local backend.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CREATE ============ -->
+<section class="page" id="page-create">
+  <div class="card">
+    <h2>Create a Reel</h2>
+    <p class="sub">The three lines become the locked titles: Topic is L1 (white, from 0s), Hook is L2 (gold, ~7s), Date is L3 (typewriter, ~15.5s).</p>
+    <div class="grid2">
+      <div>
+        <label class="flabel" for="fTopic">Topic — Title Line 1</label>
+        <input type="text" id="fTopic" placeholder="e.g. FALL OF DUNKIRK">
+        <label class="flabel" for="fHook">Hook — Title Line 2</label>
+        <input type="text" id="fHook" placeholder="e.g. GREAT ESCAPE IS OVER">
+      </div>
+      <div>
+        <label class="flabel" for="fDate">Date — Title Line 3</label>
+        <input type="text" id="fDate" placeholder="e.g. JUNE 4, 1940">
+        <label class="flabel" for="fDetail">Story detail (optional — place, units, what happened)</label>
+        <textarea id="fDetail" placeholder="e.g. British Expeditionary Force evacuated from the beaches; artillery and Stukas attacking the perimeter…"></textarea>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="genScenes" type="button">Generate Scenes</button>
+      <button class="btn ghost" id="saveProject" type="button" disabled="">Save to Library</button>
+      <button class="btn ghost" id="dlSheet" type="button" disabled="">Download Production Sheet</button>
+      <button class="btn" id="exportReel" type="button" disabled="">Export Final Reel (WebM)</button>
+      <button class="btn ghost" id="genVoice" type="button" disabled="">Generate Voiceover (Local TTS)</button>
+      <button class="btn" id="exportMp4" type="button" disabled="">Export MP4 (Local Backend)</button>
+    </div>
+    <div class="statusline" id="createMsg" role="status"></div>
+    <div class="progress" id="mp4Bar" style="display:none"><i></i></div>
+    <div class="statusline" id="voiceStatus" role="status"></div>
+    <div class="statusline" id="mp4Status" role="status"></div>
+    <div class="statusline" id="exportStatus" role="status">Browser WebM export uses your selected scene clips and the locked title layout; audio is not mixed in the WebM. For a true MP4 with mixed sound, use Export MP4 (Local Backend).</div>
+  </div>
+
+  <div class="card" id="previewCard" style="display:none">
+    <h2>Reel Preview &amp; Quality Checklist</h2>
+    <p class="sub">1080×1920 proportions — thick black bars, footage in the middle window, titles only in the top bar on the locked timings.</p>
+    <div class="preview-grid">
+      <div>
+        <div class="phone" aria-label="Reel preview frame">
+          <div class="pbar-top">
+            <div class="pt-l1" id="pvL1"></div>
+            <div class="pt-l2" id="pvL2" style="visibility:hidden"></div>
+            <div class="pt-l3" id="pvL3"></div>
+          </div>
+          <div class="pwin" id="pvWin"><div class="placeholder">Press Play Preview</div></div>
+          <div class="pbar-bot"></div>
+        </div>
+        <div class="btnrow" style="justify-content:center">
+          <button class="btn small" id="pvPlay" type="button">▶ Play Preview</button>
+          <button class="btn ghost small" id="pvStop" type="button">Stop</button>
+        </div>
+        <div class="statusline" id="pvTime" style="text-align:center"></div>
+      </div>
+      <div>
+        <h3 style="margin-top:0">Pre-export Quality Checklist</h3>
+        <ul class="checklist" id="checklist"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="scenes"></div>
+</section>
+
+<!-- ============ LIBRARY ============ -->
+<section class="page" id="page-library">
+  <div class="card">
+    <h2>Library</h2>
+    <p class="sub">Projects saved in this browser. Open one to keep working on it in Create; footage selections are kept with the project. For durable storage with media and exports, use the Server Library below.</p>
+    <div id="libList"><div class="empty">Library is empty.<br>Create a breakdown in Create and press “Save to Library”.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Server Library — Local Backend</h2>
+    <p class="sub">Projects stored in the local backend's SQLite database on this machine. They survive browser clears and keep your uploaded media and export history.</p>
+    <div class="btnrow" style="margin:0 0 12px">
+      <button class="btn" id="saveToBackend" type="button">Save Current Project to Backend</button>
+      <button class="btn ghost" id="refreshServerLib" type="button">Refresh</button>
+    </div>
+    <div class="statusline" id="serverLibMsg" role="status"></div>
+    <div id="serverLibList"><div class="empty">Backend projects will appear here.</div></div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p class="fnote"><strong>Local Backend Edition</strong> — the studio runs on your own machine with the free Python backend: no API keys, no accounts, no cloud. Archive clips are real historical footage from the free sources linked per scene; this studio contains no AI video generation. Start the backend with <span class="mono">start.bat</span>, then open this page.</p>
+  <div class="btnrow" style="justify-content:center"><button class="btn" id="dlSelf" type="button">Download This Studio as One HTML File</button></div>
+  <p class="fnote" style="margin-top:10px">The downloadable file is the frontend only — the full studio is the project folder (backend + frontend) launched by <span class="mono">start.bat</span>.</p>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+/* ================= State ================= */
+var LS = { style:"hark_portable_style", lib:"hark_portable_library", cur:"hark_portable_current" };
+function lsGet(k, d){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+var archiveFiles = Object.create(null); // Local object URLs; source files remain on this device.
+var state = {
+  style: lsGet(LS.style, null),
+  library: lsGet(LS.lib, []),
+  project: lsGet(LS.cur, null)
+};
+var BOB_STYLE = {
+  name:"Battle of Britain — Reference Style",
+  era:"Summer 1940, RAF Fighter Command, south-east England",
+  subject:"Period-correct British aircraft, airfields and personnel only — Hurricanes, Spitfires, RAF flying kit",
+  look:"Cinematic period realism shot on virtual 35mm: visible film grain, soft halation on highlights, dust and exhaust haze in the air",
+  colour:"Muted period colour — khaki, slate grey, dull brass, faded sky blue, chalk white — slightly desaturated, warm shadows, no HDR pop",
+  grade:"CLEAR-WHITE grade: bright, clean highlights, lifted whites (gamma ~1.16), never dark or crushed",
+  format:"Vertical 9:16, 1080×1920, action framing, camera at human height",
+  rules:"No drones or aerial establishing shots unless the scene demands it; no modern objects, clothing, signage or aircraft marks; no on-screen text; nothing clean, digital or modern"
+};
+var RECIPE = [
+  ["Restore","hqdn3d denoise (4:3:6) + deinterlace if the source is interlaced; stabilise shake"],
+  ["Upscale","Lanczos upscale to at least 1080 wide for the 9:16 crop"],
+  ["Sharpen","unsharp mask (5:5:0.8) — edges crisp, faces readable"],
+  ["Grade","CLEAR-WHITE grade: gamma ~1.16, gentle contrast S-curve, saturation ~1.05 — bright and clean, never dark/crushed"],
+  ["Smooth","Optional 48fps motion interpolation for the smooth competitor look"],
+  ["Grain","Light uniform grain overlay so old and new clips sit together"],
+  ["Sound","Scene's own combat sound only, synced to the exact frame — no narration, no music"],
+  ["Assemble","Locked title format: L1 white 0s · L2 gold ~7s · L3 typewriter ~15.5s, top black bar only"]
+];
+var SOURCES = [
+  ["Internet Archive", function(q){ return "https://archive.org/search?query=" + encodeURIComponent(q); }],
+  ["Wikimedia Commons", function(q){ return "https://commons.wikimedia.org/w/index.php?search=" + encodeURIComponent(q) + "&title=Special:MediaSearch&type=video"; }],
+  ["PICRYL", function(q){ return "https://picryl.com/search?q=" + encodeURIComponent(q); }],
+  ["NARA Catalog", function(q){ return "https://catalog.archives.gov/search?q=" + encodeURIComponent(q); }],
+  ["DVIDS", function(q){ return "https://www.dvidshub.net/search?q=" + encodeURIComponent(q); }],
+  ["Prelinger Archives", function(q){ return "https://archive.org/search?query=" + encodeURIComponent(q + " collection:prelinger"); }],
+  ["IWM Collections", function(q){ return "https://www.iwm.org.uk/collections/search?query=" + encodeURIComponent(q); }],
+  ["Europeana", function(q){ return "https://www.europeana.eu/en/search?query=" + encodeURIComponent(q); }],
+  ["British Pathé", function(q){ return "https://www.britishpathe.com/search/query/" + encodeURIComponent(q); }]
+];
+
+/* ================= Helpers ================= */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+var toastT=null;
+function toast(msg){ var t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove("show"); }, 3400); }
+function uid(){ return "p" + Date.now().toString(36) + Math.floor(Math.random()*999).toString(36); }
+function saveCur(){ lsSet(LS.cur, state.project); }
+function totalDur(p){ return p ? p.scenes.reduce(function(a,s){ return a + (s.duration||0); },0) : 0; }
+
+/* ================= Tabs ================= */
+document.querySelectorAll(".tab-btn").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.querySelectorAll(".tab-btn").forEach(function(x){ x.classList.remove("active"); });
+    document.querySelectorAll("section.page").forEach(function(x){ x.classList.remove("active"); });
+    b.classList.add("active");
+    $("page-" + b.dataset.tab).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+});
+function goTab(name){ document.querySelector('.tab-btn[data-tab="' + name + '"]').click(); }
+
+/* ================= Setup ================= */
+function renderStyle(){
+  var p = $("stylePanel");
+  if(!state.style){ p.innerHTML = '<div class="empty">No style loaded yet.<br>Load the template, then go to Create.</div>'; return; }
+  var s = state.style;
+  p.innerHTML = '<div class="stylepanel"><dl>'
+    + "<dt>Style</dt><dd><strong>" + esc(s.name) + "</strong></dd>"
+    + "<dt>Era</dt><dd>" + esc(s.era) + "</dd>"
+    + "<dt>Subjects</dt><dd>" + esc(s.subject) + "</dd>"
+    + "<dt>Look</dt><dd>" + esc(s.look) + "</dd>"
+    + "<dt>Colour</dt><dd>" + esc(s.colour) + "</dd>"
+    + "<dt>Grade</dt><dd>" + esc(s.grade) + "</dd>"
+    + "<dt>Format</dt><dd>" + esc(s.format) + "</dd>"
+    + "<dt>Rules</dt><dd>" + esc(s.rules) + "</dd>"
+    + "</dl></div>";
+}
+$("loadTemplate").addEventListener("click", function(){
+  state.style = JSON.parse(JSON.stringify(BOB_STYLE));
+  lsSet(LS.style, state.style);
+  renderStyle();
+  toast("Battle of Britain style loaded — every scene will be locked to it");
+});
+$("clearStyle").addEventListener("click", function(){ state.style=null; lsSet(LS.style,null); renderStyle(); });
+
+/* ================= Scene engine ================= */
+function styleBlock(){
+  var s = state.style || BOB_STYLE;
+  return { era:s.era, look:s.look, colour:s.colour, grade:s.grade, rules:s.rules };
+}
+function buildPrompt(core, st){
+  return "Vertical 9:16, 1080x1920. "
+    + "SUBJECT: " + core.subject + ". "
+    + "ACTION: " + core.action + ". "
+    + "ENVIRONMENT: " + core.environment + ". "
+    + "PERIOD DETAILS: " + core.period + ". "
+    + "LIGHTING: " + core.lighting + ". "
+    + "CAMERA: " + core.camera + ". "
+    + "GRADE: " + st.grade + "; " + st.colour + ". "
+    + "LOOK: " + st.look + ". "
+    + "NEGATIVES: " + st.rules + "; no watermarks, no subtitles, no logos.";
+}
+function demoScenes(topic, hook, date, detail){
+  var T = topic || "UNTITLED BATTLE";
+  var D = detail ? (" Story detail given: " + detail) : "";
+  var st = styleBlock();
+  var raw = [
+    { key:"establish", title:"The Calm Before — Forces Gather", dur:4, shot:"Establishing", kind:"scene",
+      subject:"Period troops and equipment in position, waiting", action:"men scan the sky and horizon, engines idle, tension rising",
+      environment:"the battle location at first light", period:"authentic period uniforms, vehicles and markings throughout",
+      lighting:"low early light through haze", camera:"slow push-in at human height, locked-off feel",
+      narr:"Narration (if used): “" + T.toLowerCase() + " — it began here.” Combat sound only in the final reel.",
+      sound:"Distant engines, wind, faint radio chatter", search:T + " troops waiting footage" },
+    { key:"firing1", title:"Opening Fire — Guns Speak", dur:4, shot:"Firing", kind:"firing",
+      subject:"A period artillery gun / heavy weapon crew in action", action:"the gun FIRES with full recoil and muzzle flash, crew reloading at speed",
+      environment:"gun position, dust and cordite smoke in the air", period:"correct period gun, uniforms and ammunition handling",
+      lighting:"hard daylight, flash lighting the smoke", camera:"tight side angle, slight shake on the shot",
+      narr:"No narration — the gun is the voice of this scene.",
+      sound:"The gun's own blast, exactly on the firing frame, then recoil and reload clatter", search:T + " artillery firing footage" },
+    { key:"impact1", title:"Impact — The Target Is Hit", dur:4, shot:"Impact", kind:"impact",
+      subject:"The target position struck by the shells just fired", action:"a direct hit — explosion, debris and dust thrown high, position destroyed",
+      environment:"the receiving end of the fire, immediately after the firing scene", period:"period structures and vehicles, no modern damage effects",
+      lighting:"blast light then thick dust haze", camera:"locked wide shot so the full destruction reads",
+      narr:"No narration — impact sound carries it.",
+      sound:"Shell arrival whistle cutting straight into the explosion, debris falling", search:T + " explosion impact destruction footage" },
+    { key:"firing2", title:"Second Salvo — Armour Fires", dur:4, shot:"Firing", kind:"firing",
+      subject:"A period tank / armoured vehicle main gun", action:"the tank FIRES, muzzle blast kicking up dust, hull rocking with recoil",
+      environment:"armour advancing or hull-down in the battle area", period:"period-correct tank model, markings and crew kit",
+      lighting:"bright daylight, blast dust lit by sun", camera:"low front three-quarter angle, dust washing over lens",
+      narr:"No narration — engine and gun only.",
+      sound:"Main gun blast synced to the flash, engine roar underneath", search:T + " tank firing footage" },
+    { key:"impact2", title:"Impact — Position Destroyed", dur:5, shot:"Impact", kind:"impact",
+      subject:"A building / strongpoint hit by the tank's fire", action:"the structure is struck and collapses in dust and flame, the biggest destruction of the reel",
+      environment:"the strongpoint at the moment of the hit", period:"period architecture and rubble, no modern materials",
+      lighting:"firelight inside dust cloud", camera:"steady wide shot, hold on the collapse",
+      narr:"No narration — the collapse is the payoff.",
+      sound:"Impact crack then the long rumble of the collapse", search:T + " building destroyed shelling footage" },
+    { key:"aftermath", title:"Aftermath — What Remained", dur:4, shot:"Aftermath", kind:"aftermath",
+      subject:"The battlefield after the fighting — wreckage and silence", action:"smoke drifts over wrecks and rubble, a lone figure walks through frame",
+      environment:"the same location, stilled", period:"abandoned period vehicles and equipment, smoke-blackened",
+      lighting:"pale light through smoke", camera:"very slow lateral move, elegiac and still",
+      narr:"Closing line (if used): “" + (hook || "And then — silence") + ".”",
+      sound:"Wind, distant fire crackle, a single far-off engine fading", search:T + " aftermath wreckage footage" }
+  ];
+  return raw.map(function(r, i){
+    var core = { subject:r.subject, action:r.action, environment:r.environment + ". " + st.era + D, period:r.period, lighting:r.lighting, camera:r.camera };
+    return { id:uid()+i, n:i+1, title:r.title, duration:r.dur, shotType:r.shot, kind:r.kind,
+      camera:r.camera, narration:r.narr, soundCue:r.sound, searchTerm:r.search,
+      prompt:buildPrompt(core, st), videoUrl:"", videoStatus:"none", videoError:"" };
+  });
+}
+/* ================= Create / render ================= */
+function presetVal(){ return "local"; }
+function presetLabel(v){ return "Local backend · archival footage (no AI video)"; }
+
+$("genScenes").addEventListener("click", async function(){
+  var topic = $("fTopic").value.trim(), hook = $("fHook").value.trim(), date = $("fDate").value.trim(), detail = $("fDetail").value.trim();
+  var msg = $("createMsg");
+  if(!topic){ msg.textContent = "Give the reel a Topic first — it becomes title line 1."; msg.className = "statusline err"; $("fTopic").focus(); return; }
+  if(!state.style){ state.style = JSON.parse(JSON.stringify(BOB_STYLE)); lsSet(LS.style, state.style); renderStyle(); }
+  var btn = $("genScenes"); btn.disabled = true; btn.textContent = "Writing scenes…";
+  var scenes = null, mode = "";
+  if(window.harkBackendScenes){
+    try {
+      var viaBackend = await window.harkBackendScenes(topic, hook, date, detail);
+      if(viaBackend && viaBackend.scenes && viaBackend.scenes.length){ scenes = viaBackend.scenes; mode = viaBackend.modeLabel; }
+    } catch(e){ msg.textContent = e.message; msg.className = "statusline err"; }
+  }
+  if(!scenes){ scenes = demoScenes(topic.toUpperCase(), hook, date, detail); mode = "built-in demo engine (local backend not reached)"; }
+  state.project = { id:uid(), topic:topic.toUpperCase(), hook:(hook||"").toUpperCase(), date:(date||"").toUpperCase(),
+    detail:detail, preset:presetVal(), styleName:state.style.name, createdAt:new Date().toISOString(), scenes:scenes };
+  saveCur();
+  btn.disabled = false; btn.textContent = "Generate Scenes";
+  msg.textContent = scenes.length + " scenes · " + totalDur(state.project) + "s total · written by " + mode + ", locked to “" + state.style.name + "”.";
+  msg.className = "statusline ok";
+  renderProject();
+  toast("Scene breakdown ready");
+});
+
+function sceneCard(s, idx){
+  var links = SOURCES.map(function(src){ return '<a href="' + esc(src[1](s.searchTerm)) + '" target="_blank" rel="noopener">' + esc(src[0]) + "</a>"; }).join("");
+  var recipe = RECIPE.map(function(r){ return "<li><strong>" + esc(r[0]) + ".</strong> " + esc(r[1]) + "</li>"; }).join("");
+  var vstat = (archiveFiles[s.id] || s.mediaId) ? '<span class="chip vstat ready">Footage attached</span>'
+    : '<span class="chip vstat">No footage yet</span>';
+  return '<article class="scene" data-scene="' + s.id + '">'
+    + '<div class="scene-head"><div class="snum">' + (idx+1) + '</div><div style="flex:1;min-width:200px">'
+    + "<h3>" + esc(s.title) + '</h3><div class="badges">'
+    + '<span class="chip ' + esc(s.kind) + '">' + esc(s.shotType) + "</span>"
+    + '<span class="chip">' + s.duration + 's</span>'
+    + '<span class="chip">' + esc(s.camera) + "</span>" + vstat
+    + "</div></div></div>"
+    + '<div class="scene-body">'
+    + "<h4>Ready-to-shoot video prompt</h4><div class=\"promptbox\">" + esc(s.prompt) + "</div>"
+    + (s.narration ? "<h4>Narration / note</h4><p class=\"narr\">" + esc(s.narration) + "</p>" : "")
+    + "<h4>Sound cue — combat only, synced</h4><p style=\"margin:4px 0;color:var(--ink2)\">" + esc(s.soundCue) + "</p>"
+    + "<h4>Find free archival clips — “" + esc(s.searchTerm) + "”</h4><div class=\"srclinks\">" + links + "</div>"
+    + '<h4>Upload archival / licensed footage for this scene</h4>'
+    + '<input type="file" accept="video/*" data-archive="' + s.id + '" style="width:100%;color:var(--ink2);padding:8px;background:#0d0b07;border:1px solid var(--line2);border-radius:8px">'
+    + (s.archiveName ? '<div class="statusline ok">Selected: ' + esc(s.archiveName) + ' · ' + (archiveFiles[s.id] ? 'ready in this session' : (s.mediaId ? 'stored on the local backend' : 're-upload after reopening')) + '</div>' : '<div class="statusline">No footage selected yet — upload the archival clip for this scene.</div>')
+    + (archiveFiles[s.id] ? '<div class="video-slot"><video controls preload="metadata" src="' + esc(archiveFiles[s.id]) + '"></video></div>' : '')
+    + (!archiveFiles[s.id] && s.mediaUrl ? '<div class="video-slot"><video controls preload="metadata" src="' + esc(s.mediaUrl) + '"></video></div>' : '')
+    + '<details class="more"><summary>Quality-enhance recipe — 8 steps</summary><ol class="recipe">' + recipe + "</ol></details>"
+    + '<div class="statusline">Workflow: find the clip with the archive links above, download it, enhance it with the recipe, then upload it here. The local backend renders the final MP4.</div>'
+    + "</div></article>";
+}
+function renderProject(){
+  var p = state.project;
+  var has = !!p;
+  $("saveProject").disabled = !has; $("dlSheet").disabled = !has; $("exportReel").disabled = !has;
+  var gv = $("genVoice"), em = $("exportMp4"); if(gv) gv.disabled = !has; if(em) em.disabled = !has;
+  $("previewCard").style.display = has ? "block" : "none";
+  $("scenes").innerHTML = has ? p.scenes.map(sceneCard).join("") : "";
+  if(has){ renderPreviewTitles(0); renderChecklist(); }
+  document.querySelectorAll('[data-archive]').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      var f = inp.files && inp.files[0]; if(!f) return;
+      if(!f.type.startsWith('video/')) { toast('Please choose a video file.'); return; }
+      var id = inp.dataset.archive;
+      if(archiveFiles[id]) URL.revokeObjectURL(archiveFiles[id]);
+      archiveFiles[id] = URL.createObjectURL(f);
+      var sc = state.project && state.project.scenes.find(function(x){ return x.id===id; });
+      if(sc){ sc.archiveName = f.name; saveCur(); }
+      if(sc && window.harkUploadSceneMedia){ window.harkUploadSceneMedia(f, sc); }
+      renderProject(); toast('Footage attached to scene ' + (sc ? sc.n : ''));
+    });
+  });
+}
+function renderChecklist(){
+  var p = state.project; if(!p) return;
+  var items = [];
+  var titlesSet = !!(p.topic && p.hook && p.date);
+  items.push([titlesSet, "All three titles set", "L1 “" + (p.topic||"—") + "” · L2 “" + (p.hook||"—") + "” · L3 “" + (p.date||"—") + "”"]);
+  items.push([titlesSet, "Titles timed to the lock", "L1 from 0s · L2 gold at ~7s · L3 typewriter from ~15.5s — top bar only"]);
+  var orderOk = false;
+  for(var i=0;i<p.scenes.length-1;i++){ if(p.scenes[i].kind==="firing" && p.scenes[i+1].kind==="impact") orderOk = true; }
+  var lastOk = p.scenes.length && p.scenes[p.scenes.length-1].kind==="aftermath";
+  items.push([orderOk && !!lastOk, "Firing → impact order, aftermath last", orderOk ? (lastOk ? "At least one firing scene is followed immediately by its impact." : "Firing→impact found, but the last scene is not aftermath.") : "No firing scene is immediately followed by an impact scene."]);
+  items.push([p.scenes.every(function(s){ return !!s.soundCue; }), "Sound cue on every clip", "Combat sound only — no narration, no music"]);
+  var d = totalDur(p);
+  items.push([d>=15 && d<=30, "Runtime 15–30 seconds", "Current total: " + d + "s across " + p.scenes.length + " clips"]);
+  items.push([p.scenes.every(function(s){ return s.prompt && s.prompt.length>80; }), "Full 8-part prompt on every scene", "Subject, action, environment, period, lighting, camera, CLEAR-WHITE grade, negatives"]);
+  var ready = p.scenes.filter(function(s){ return !!archiveFiles[s.id] || !!s.mediaId; }).length;
+  items.push([ready===p.scenes.length && ready>0, "Scene footage ready — " + ready + " / " + p.scenes.length, ready===p.scenes.length ? "Every scene has uploaded archival footage." : "Upload archival footage for the remaining scenes."]);
+  $("checklist").innerHTML = items.map(function(it){
+    return '<li class="' + (it[0] ? "pass" : "") + '"><strong>' + esc(it[1]) + '</strong><span class="note">' + esc(it[2]) + "</span></li>";
+  }).join("");
+}
+
+/* ================= Reel Preview ================= */
+var pvTimer = null, pvStart = 0, typeTimer = null;
+function renderPreviewTitles(elapsed){
+  var p = state.project; if(!p) return;
+  $("pvL1").textContent = p.topic || "";
+  var l2 = $("pvL2");
+  l2.textContent = p.hook || "";
+  l2.style.visibility = elapsed >= 7 ? "visible" : "hidden";
+  var l3 = $("pvL3");
+  if(elapsed >= 15.5 && p.date){
+    var chars = Math.min(p.date.length, Math.floor((elapsed - 15.5) * 14));
+    l3.textContent = p.date.slice(0, chars);
+  } else l3.textContent = "";
+  $("pvTime").textContent = p ? ("t = " + elapsed.toFixed(1) + "s / " + totalDur(p) + "s") : "";
+}
+function pvShowScene(elapsed){
+  var p = state.project; if(!p) return;
+  var acc = 0, cur = p.scenes[p.scenes.length-1];
+  for(var i=0;i<p.scenes.length;i++){ if(elapsed < acc + p.scenes[i].duration){ cur = p.scenes[i]; break; } acc += p.scenes[i].duration; }
+  var win = $("pvWin");
+  var clipSrc = archiveFiles[cur.id] || cur.mediaUrl || "";
+  if(clipSrc){
+    if(!win.querySelector("video") || win.querySelector("video").dataset.sid !== cur.id){
+      win.innerHTML = '<video data-sid="' + cur.id + '" src="' + esc(clipSrc) + '" autoplay muted loop playsinline></video>';
+    }
+  } else {
+    win.innerHTML = '<div class="placeholder">SCENE ' + cur.n + " — " + esc(cur.title.toUpperCase()) + "<br>" + esc(cur.shotType) + " · " + cur.duration + "s<br><br>" + "No footage attached yet —<br>upload a clip on this scene card" + "</div>";
+  }
+}
+$("pvPlay").addEventListener("click", function(){
+  var p = state.project; if(!p) return;
+  pvStopFn();
+  pvStart = Date.now();
+  pvShowScene(0); renderPreviewTitles(0);
+  pvTimer = setInterval(function(){
+    var el = (Date.now() - pvStart) / 1000;
+    if(el >= totalDur(p)){ pvStopFn(); renderPreviewTitles(totalDur(p)); pvShowScene(totalDur(p) - 0.01); $("pvTime").textContent = "Preview finished — " + totalDur(p) + "s"; return; }
+    renderPreviewTitles(el); pvShowScene(el);
+  }, 100);
+});
+function pvStopFn(){ if(pvTimer){ clearInterval(pvTimer); pvTimer = null; } }
+$("pvStop").addEventListener("click", function(){ pvStopFn(); renderPreviewTitles(0); $("pvWin").innerHTML = '<div class="placeholder">Press Play Preview</div>'; });
+
+/* ================= Final Reel Export (browser WebM) ================= */
+function waitForEvent(el, name){ return new Promise(function(resolve,reject){
+  var done=false; function clean(){el.removeEventListener(name,ok);el.removeEventListener('error',bad);}
+  function ok(){if(done)return;done=true;clean();resolve();} function bad(){if(done)return;done=true;clean();reject(new Error('A selected clip could not be decoded.'));}
+  el.addEventListener(name,ok,{once:true});el.addEventListener('error',bad,{once:true});
+}); }
+$("exportReel").addEventListener('click', async function(){
+  var p=state.project; if(!p || !p.scenes.length) return;
+  if(!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream){ toast('This browser does not support video export. Please use a recent Chrome or Edge.'); return; }
+  var missing=p.scenes.filter(function(sc){return !archiveFiles[sc.id] && !sc.mediaUrl;});
+  if(missing.length){ toast('Attach footage to every scene before export.'); return; }
+  var btn=$("exportReel"); btn.disabled=true; $("exportStatus").textContent='Preparing your final reel… keep this tab open until export finishes.';
+  var canvas=document.createElement('canvas'); canvas.width=1080; canvas.height=1920;
+  var ctx=canvas.getContext('2d'); var stream=canvas.captureStream(30);
+  var mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+  var recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:8000000}); var chunks=[];
+  recorder.ondataavailable=function(e){if(e.data && e.data.size) chunks.push(e.data);};
+  var finished=new Promise(function(resolve,reject){recorder.onstop=resolve;recorder.onerror=function(){reject(new Error('Browser recorder failed.'));};});
+  var v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto';
+  function drawFrame(t, clip){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,1080,1920);
+    // letterbox title zone and footage window match the studio's reference composition
+    ctx.fillStyle='#050505';ctx.fillRect(0,0,1080,500);ctx.fillRect(0,1458,1080,462);
+    if(clip && v.readyState>=2){var scale=Math.max(1080/v.videoWidth,958/v.videoHeight);var w=v.videoWidth*scale,h=v.videoHeight*scale;ctx.drawImage(v,(1080-w)/2,500+(958-h)/2,w,h);}
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.font='800 66px Arial';wrapText(ctx,p.topic.toUpperCase(),540,135,940,76,2);
+    if(t>=7){ctx.fillStyle='#e8c766';ctx.font='700 48px Arial';wrapText(ctx,p.hook.toUpperCase(),540,300,940,58,2);}
+    if(t>=15.5){var n=Math.min(p.date.length,Math.floor((t-15.5)*14));ctx.fillStyle='#d8d2c0';ctx.font='32px monospace';ctx.fillText(p.date.toUpperCase().slice(0,n),540,420);}
+  }
+  function wrapText(c,text,x,y,maxW,lineH,maxLines){var words=text.split(/\s+/),line='',lines=[];words.forEach(function(w){var test=line?line+' '+w:w;if(c.measureText(test).width>maxW && line){lines.push(line);line=w;}else line=test;});if(line)lines.push(line);lines=lines.slice(0,maxLines);var start=y-(lines.length-1)*lineH/2;lines.forEach(function(l,i){c.fillText(l,x,start+i*lineH);});}
+  try{
+    recorder.start();var elapsed=0;drawFrame(0,false);
+    for(var i=0;i<p.scenes.length;i++){
+      var sc=p.scenes[i],src=archiveFiles[sc.id] || sc.mediaUrl;
+      v.pause();v.removeAttribute('src');v.load();v.src=src;v.currentTime=0;
+      await waitForEvent(v,'loadedmetadata');
+      try{await v.play();}catch(e){}
+      var start=performance.now(),dur=(sc.duration||4)*1000;
+      await new Promise(function(resolve){function frame(){var now=performance.now(),part=Math.min(1,(now-start)/dur);drawFrame(elapsed+part*(sc.duration||4),true);if(part>=1){resolve();return;}requestAnimationFrame(frame);}requestAnimationFrame(frame);});
+      elapsed+=(sc.duration||4);v.pause();
+    }
+    recorder.stop();await finished;
+    var blob=new Blob(chunks,{type:'video/webm'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='hark-history-'+(p.topic||'reel').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.webm';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},60000);
+    $("exportStatus").textContent='Export complete. Downloaded WebM video. Sound mixing and MP4 encoding are not included in this browser-only export.';toast('Final reel exported');
+  }catch(e){try{if(recorder.state!=='inactive')recorder.stop();}catch(_){} $("exportStatus").textContent='Export failed: '+(e.message||e);toast('Export failed — check selected clips and try again.');}
+  finally{btn.disabled=false;stream.getTracks().forEach(function(t){t.stop();});}
+});
+
+/* ================= Library ================= */
+function renderLibrary(){
+  $("libCount").textContent = state.library.length;
+  var el = $("libList");
+  if(!state.library.length){ el.innerHTML = '<div class="empty">Library is empty.<br>Create a breakdown in Create and press “Save to Library”.</div>'; return; }
+  el.innerHTML = state.library.map(function(p){
+    var ready = p.scenes.filter(function(s){ return !!s.mediaId || !!s.archiveName; }).length;
+    return '<div class="lib-item"><div class="grow"><h3>' + esc(p.topic) + "</h3>"
+      + '<div class="meta">' + esc(p.hook || "") + (p.date ? " · " + esc(p.date) : "") + "</div>"
+      + '<div class="meta">' + p.scenes.length + " scenes · " + totalDur(p) + "s · " + ready + " with footage · " + esc(presetLabel(p.preset)) + " · saved " + esc(new Date(p.createdAt).toLocaleString()) + "</div></div>"
+      + '<div class="btnrow" style="margin:0"><button class="btn small" data-open="' + p.id + '">Open</button>'
+      + '<button class="btn danger small" data-del="' + p.id + '">Delete</button></div></div>';
+  }).join("");
+  el.querySelectorAll("[data-open]").forEach(function(b){ b.addEventListener("click", function(){
+    var p = state.library.find(function(x){ return x.id===b.dataset.open; }); if(!p) return;
+    state.project = JSON.parse(JSON.stringify(p)); saveCur();
+    $("fTopic").value = p.topic; $("fHook").value = p.hook; $("fDate").value = p.date; $("fDetail").value = p.detail || "";
+    renderProject(); goTab("create"); toast("Project opened in Create");
+  }); });
+  el.querySelectorAll("[data-del]").forEach(function(b){ b.addEventListener("click", function(){
+    if(b.dataset.armed){ state.library = state.library.filter(function(x){ return x.id!==b.dataset.del; });
+      lsSet(LS.lib, state.library); renderLibrary(); toast("Project deleted"); }
+    else { b.dataset.armed = "1"; b.textContent = "Confirm delete?"; setTimeout(function(){ if(b.isConnected){ delete b.dataset.armed; b.textContent = "Delete"; } }, 3000); }
+  }); });
+}
+$("saveProject").addEventListener("click", function(){
+  var p = state.project; if(!p) return;
+  var copy = JSON.parse(JSON.stringify(p));
+  var ix = state.library.findIndex(function(x){ return x.id===copy.id; });
+  if(ix >= 0) state.library[ix] = copy; else state.library.unshift(copy);
+  lsSet(LS.lib, state.library); renderLibrary();
+  toast("Saved to Library");
+});
+
+/* ================= Production Sheet ================= */
+function sheetHTML(p){
+  var rows = p.scenes.map(function(s){
+    var links = SOURCES.map(function(src){ return '<a href="' + esc(src[1](s.searchTerm)) + '">' + esc(src[0]) + "</a>"; }).join(" · ");
+    return "<tr><td>" + s.n + "</td><td><strong>" + esc(s.title) + "</strong><br>" + esc(s.shotType) + " · " + s.duration + "s · " + esc(s.camera)
+      + "<br><em>" + esc(s.prompt) + "</em><br>Sound: " + esc(s.soundCue)
+      + "<br>Archive search “" + esc(s.searchTerm) + "”: " + links
+      + "<br>Status: " + (s.mediaId ? "Footage stored on local backend — " + esc(s.archiveName || "uploaded clip") : (s.archiveName ? "Footage selected — " + esc(s.archiveName) : "No footage yet")) + "</td></tr>";
+  }).join("");
+  var recipe = RECIPE.map(function(r, i){ return "<li><strong>Step " + (i+1) + " — " + esc(r[0]) + ".</strong> " + esc(r[1]) + "</li>"; }).join("");
+  return "<!doctype html><html><head><meta charset='utf-8'><title>Production Sheet — " + esc(p.topic) + "</title>"
+    + "<style>body{font-family:Georgia,serif;max-width:820px;margin:30px auto;padding:0 18px;color:#1a1a1a}h1{font-size:26px}table{border-collapse:collapse;width:100%}td{border:1px solid #999;padding:9px;vertical-align:top;font-size:13.5px}em{color:#444}.gold{color:#8a6d00}</style></head><body>"
+    + "<h1>HARK HISTORY STUDIO — Production Sheet</h1>"
+    + "<p><strong>Project:</strong> " + esc(p.topic) + "<br><strong>Style:</strong> " + esc(p.styleName) + "<br><strong>Preset:</strong> " + esc(presetLabel(p.preset))
+    + "<br><strong>Runtime:</strong> " + totalDur(p) + "s · " + p.scenes.length + " clips · Format 1080×1920 (9:16) · Combat sound only</p>"
+    + "<h2>Titles — locked timings</h2><table>"
+    + "<tr><td>L1 — 0s, white, largest</td><td><strong>" + esc(p.topic) + "</strong></td></tr>"
+    + "<tr><td>L2 — ~7s, <span class='gold'>gold</span></td><td><strong>" + esc(p.hook) + "</strong></td></tr>"
+    + "<tr><td>L3 — ~15.5s, typewriter</td><td><strong>" + esc(p.date) + "</strong></td></tr></table>"
+    + "<h2>Scenes — firing → impact, aftermath last</h2><table>" + rows + "</table>"
+    + "<h2>Quality-enhance recipe (archive clips)</h2><ol>" + recipe + "</ol>"
+    + "<p>Generated " + esc(new Date().toLocaleString()) + " · Hark History Studio — Portable Edition</p></body></html>";
+}
+$("dlSheet").addEventListener("click", function(){
+  var p = state.project; if(!p) return;
+  var blob = new Blob([sheetHTML(p)], { type:"text/html" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hark-production-sheet-" + p.topic.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".html";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  toast("Production Sheet downloaded");
+});
+
+/* ================= Download this file ================= */
+$("dlSelf").addEventListener("click", function(){
+  var html = "<!doctype html>\n" + document.documentElement.outerHTML;
+  var blob = new Blob([html], { type:"text/html" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hark-history-studio-portable.html";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  toast("Studio file downloaded — one self-contained HTML");
+});
+
+/* ================= Init ================= */
+renderStyle(); renderLibrary();
+if(state.project){
+  var p = state.project;
+  $("fTopic").value = p.topic || ""; $("fHook").value = p.hook || ""; $("fDate").value = p.date || ""; $("fDetail").value = p.detail || "";
+  renderProject();
+} else { renderProject(); }
+</script>
+
+
+<script>
+/* ================= Local Backend wiring =================
+   Talks to the Hark History Studio Python backend on this machine.
+   Everything degrades gracefully when the backend is not running:
+   the studio keeps working in browser-only mode. */
+(function(){
+"use strict";
+var API = (location.protocol.indexOf("http") === 0) ? location.origin : "http://127.0.0.1:8765";
+window.HARK_API = API;
+var backendUp = false;
+
+function el(id){ return document.getElementById(id); }
+function apiFetch(path, opts){
+  return fetch(API + path, opts).then(function(r){
+    if(!r.ok){
+      return r.json().catch(function(){ return {}; }).then(function(d){
+        throw new Error(d.detail || ("Backend error " + r.status));
+      });
+    }
+    return r.json();
+  });
+}
+function chip(ok, label){ return '<span class="chip' + (ok ? ' vstat ready' : '') + '">' + label + '</span>'; }
+
+/* ---- Setup panel ---- */
+function renderBackendPanel(s){
+  var ig = s.image_generation || {};
+  var rows = [
+    ["Backend", true, "Connected — " + s.app + " v" + s.version],
+    ["Python", true, s.python.version + " · projects stored in SQLite on this machine"],
+    ["FFmpeg", !!s.ffmpeg.available, s.ffmpeg.available ? "Found — MP4 rendering available" : "NOT found — install FFmpeg, then restart the backend"],
+    ["Ollama (local AI scripts)", !!s.ollama.running, s.ollama.running ? ("Running — models: " + ((s.ollama.models || []).join(", ") || "none installed")) : "Not running — the offline template engine writes the scripts"],
+    ["Piper TTS (voiceover)", !!s.piper.ready, s.piper.ready ? "Ready — offline voiceovers available" : (s.piper.installed ? "Installed, but no voice model in models/piper/ yet" : "Not installed — see the README to enable voiceovers")],
+    ["Image generation (optional)", !!ig.ready, ig.ready ? "Local Stable Diffusion backend detected" : "No local SD backend running (optional — not needed for the core workflow)"],
+    ["AI video generation", false, "Removed by design — this studio uses real archival footage that you upload"]
+  ];
+  el("backendPanel").innerHTML = rows.map(function(r){
+    return '<div class="statusline" style="margin:6px 0">' + chip(r[1], r[1] ? "OK" : "—") + " <strong>" + esc(r[0]) + ".</strong> " + esc(r[2]) + "</div>";
+  }).join("");
+}
+function checkBackend(){
+  return apiFetch("/api/system/status").then(function(s){
+    backendUp = true; renderBackendPanel(s);
+    el("backendMsg").textContent = "Backend connected. Scene generation, uploads, voiceover, Server Library and MP4 export are live.";
+    el("backendMsg").className = "statusline ok";
+    refreshServerLib();
+    return s;
+  }).catch(function(){
+    backendUp = false;
+    el("backendPanel").innerHTML = '<div class="statusline err">Local backend not running.</div>'
+      + '<div class="statusline">Start it from the studio folder with <span class="mono">start.bat</span> — the studio still works in browser-only mode meanwhile: the demo scene engine, WebM export and the browser Library keep working. Uploads, voiceover, Server Library and MP4 export need the backend.</div>';
+    el("backendMsg").textContent = "";
+    return null;
+  });
+}
+var rb = el("recheckBackend"); if(rb) rb.addEventListener("click", checkBackend);
+
+/* ---- Scene generation via backend ---- */
+window.harkBackendScenes = function(topic, hook, date, detail){
+  var body = { topic: topic, hook: hook, date: date, detail: detail, style: state.style || null };
+  return apiFetch("/api/scripts/generate", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) })
+    .then(function(d){
+      var scenes = (d.scenes || []).map(function(s){
+        s.mediaUrl = s.mediaId ? (API + "/api/media/" + s.mediaId + "/file") : "";
+        return s;
+      });
+      return { scenes: scenes, modeLabel: "local backend — " + d.mode + " engine" + (d.model ? " (" + d.model + ")" : "") };
+    });
+};
+
+/* ---- Scene media upload -> backend ---- */
+window.harkUploadSceneMedia = function(file, scene){
+  if(!backendUp){ return; }
+  var fd = new FormData();
+  fd.append("file", file);
+  if(state.project && state.project.backendId) fd.append("project_id", state.project.backendId);
+  fd.append("scene_id", scene.id);
+  fetch(API + "/api/media/upload", { method:"POST", body: fd }).then(function(r){
+    if(!r.ok) return r.json().catch(function(){ return {}; }).then(function(d){ throw new Error(d.detail || ("Upload error " + r.status)); });
+    return r.json();
+  }).then(function(d){
+    scene.mediaId = d.id; scene.mediaUrl = API + d.url; saveCur(); renderProject();
+    toast("Footage stored on the local backend — Scene " + scene.n);
+  }).catch(function(e){
+    toast("Backend upload failed: " + e.message + " (clip still attached for this session)");
+  });
+};
+
+/* ---- Save current project to backend ---- */
+function ensureBackendProject(){
+  var p = state.project; if(!p) return Promise.reject(new Error("No project in Create yet."));
+  var payload = JSON.parse(JSON.stringify(p));
+  payload.id = p.backendId || p.id;
+  return apiFetch("/api/projects", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload) })
+    .then(function(saved){
+      state.project.backendId = saved.id; saveCur();
+      return saved.id;
+    });
+}
+
+/* ---- Voiceover (Piper) ---- */
+function narrationText(p){
+  return p.scenes.map(function(s){
+    return (s.narration || "")
+      .replace(/^Narration \(if used\):\s*/, "")
+      .replace(/^Closing line \(if used\):\s*/, "")
+      .replace(/^No narration.*$/, "")
+      .replace(/[“”]/g, "");
+  }).filter(function(t){ return t.trim().length > 3; }).join(" ");
+}
+var gv = el("genVoice");
+if(gv) gv.addEventListener("click", function(){
+  var p = state.project; if(!p) return;
+  var st = el("voiceStatus");
+  var text = narrationText(p);
+  if(!text){ st.textContent = "No narration text found in the scenes — template scenes only carry opening/closing lines. Add narration text to the scenes first."; st.className = "statusline err"; return; }
+  gv.disabled = true; st.textContent = "Generating voiceover with local Piper TTS…"; st.className = "statusline";
+  ensureBackendProject().then(function(pid){
+    return apiFetch("/api/audio/tts", { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ text: text, speed: 1.0, project_id: pid }) });
+  }).then(function(d){
+    state.project.voiceoverMediaId = d.media_id; saveCur();
+    st.innerHTML = "Voiceover ready (" + (d.duration ? d.duration.toFixed(1) + "s" : "WAV") + ') — it will be mixed into the MP4 export. <audio controls src="' + API + d.url + '" style="width:100%;margin-top:6px"></audio>';
+    st.className = "statusline ok";
+  }).catch(function(e){
+    st.textContent = e.message; st.className = "statusline err";
+  }).then(function(){ gv.disabled = false; });
+});
+
+/* ---- MP4 export via backend ---- */
+var em = el("exportMp4");
+if(em) em.addEventListener("click", function(){
+  var p = state.project; if(!p) return;
+  var st = el("mp4Status"), bar = el("mp4Bar");
+  var missing = p.scenes.filter(function(s){ return !s.mediaId; });
+  if(missing.length){
+    st.textContent = "Scenes " + missing.map(function(s){ return s.n; }).join(", ") + " have no footage on the backend yet. Upload a clip on each scene card first (uploads go to the backend automatically while it is running).";
+    st.className = "statusline err"; return;
+  }
+  em.disabled = true; bar.style.display = "block"; bar.querySelector("i").style.width = "2%";
+  st.textContent = "Saving project to backend…"; st.className = "statusline";
+  ensureBackendProject().then(function(pid){
+    st.textContent = "Render job started — building your MP4…";
+    return apiFetch("/api/render/jobs", { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ project_id: pid, orientation: "9:16", use_clip_audio: true,
+                             narration_media_id: p.voiceoverMediaId || null }) });
+  }).then(function(job){
+    var jobId = job.job_id;
+    var timer = setInterval(function(){
+      apiFetch("/api/render/jobs/" + jobId).then(function(j){
+        bar.querySelector("i").style.width = Math.max(2, Math.round(j.progress || 0)) + "%";
+        if(j.status === "done"){
+          clearInterval(timer); em.disabled = false;
+          var r = j.result || {};
+          st.innerHTML = "MP4 ready — " + (r.duration ? r.duration.toFixed(1) + "s" : "") + ", titles set in " + esc(r.font || "the bundled font") + '. <a class="btn small" href="' + API + (r.download_url || "") + '" download>Download MP4</a>';
+          st.className = "statusline ok";
+          toast("MP4 render complete");
+        } else if(j.status === "error"){
+          clearInterval(timer); em.disabled = false;
+          st.textContent = "Render failed: " + (j.error || "unknown error"); st.className = "statusline err";
+        } else {
+          st.textContent = "Rendering… " + Math.round(j.progress || 0) + "% — " + (j.message || "");
+        }
+      }).catch(function(){ /* keep polling */ });
+    }, 1500);
+  }).catch(function(e){
+    em.disabled = false; st.textContent = e.message; st.className = "statusline err";
+  });
+});
+
+/* ---- Server Library ---- */
+function refreshServerLib(){
+  var list = el("serverLibList"); if(!list) return;
+  if(!backendUp){ list.innerHTML = '<div class="empty">Backend not running — start it with start.bat.</div>'; return; }
+  apiFetch("/api/projects").then(function(d){
+    var ps = d.projects || [];
+    if(!ps.length){ list.innerHTML = '<div class="empty">No backend projects yet.<br>Create a breakdown, then press “Save Current Project to Backend”.</div>'; return; }
+    list.innerHTML = ps.map(function(p){
+      return '<div class="lib-item"><div class="grow"><h3>' + esc(p.topic) + "</h3>"
+        + '<div class="meta">' + esc(p.hook || "") + (p.date ? " · " + esc(p.date) : "") + "</div>"
+        + '<div class="meta">' + p.sceneCount + " scenes · " + p.totalDuration + "s · saved " + esc(new Date(p.updatedAt).toLocaleString()) + "</div></div>"
+        + '<div class="btnrow" style="margin:0"><button class="btn small" data-sopen="' + p.id + '">Open</button>'
+        + '<button class="btn danger small" data-sdel="' + p.id + '">Delete</button></div></div>';
+    }).join("");
+    list.querySelectorAll("[data-sopen]").forEach(function(b){ b.addEventListener("click", function(){
+      apiFetch("/api/projects/" + b.dataset.sopen).then(function(p){
+        p.scenes.forEach(function(s){ s.mediaUrl = s.mediaId ? (API + "/api/media/" + s.mediaId + "/file") : ""; });
+        state.project = p; saveCur();
+        el("fTopic").value = p.topic || ""; el("fHook").value = p.hook || "";
+        el("fDate").value = p.date || ""; el("fDetail").value = p.detail || "";
+        renderProject(); goTab("create"); toast("Backend project opened in Create");
+      }).catch(function(e){ toast(e.message); });
+    }); });
+    list.querySelectorAll("[data-sdel]").forEach(function(b){ b.addEventListener("click", function(){
+      if(b.dataset.armed){
+        apiFetch("/api/projects/" + b.dataset.sdel, { method:"DELETE" }).then(function(){
+          refreshServerLib(); toast("Backend project deleted");
+        }).catch(function(e){ toast(e.message); });
+      } else { b.dataset.armed = "1"; b.textContent = "Confirm delete?"; setTimeout(function(){ if(b.isConnected){ delete b.dataset.armed; b.textContent = "Delete"; } }, 3000); }
+    }); });
+  }).catch(function(){ list.innerHTML = '<div class="empty">Could not load backend projects.</div>'; });
+}
+window.harkRefreshServerLib = refreshServerLib;
+var sb = el("saveToBackend");
+if(sb) sb.addEventListener("click", function(){
+  var msg = el("serverLibMsg");
+  if(!state.project){ msg.textContent = "Create a project in the Create tab first."; msg.className = "statusline err"; return; }
+  ensureBackendProject().then(function(){
+    msg.textContent = "Saved to the local backend (SQLite)."; msg.className = "statusline ok";
+    refreshServerLib();
+  }).catch(function(e){ msg.textContent = e.message; msg.className = "statusline err"; });
+});
+var rf = el("refreshServerLib"); if(rf) rf.addEventListener("click", refreshServerLib);
+
+checkBackend();
+})();
+</script>
+
+</body></html>
