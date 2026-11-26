@@ -1,0 +1,4 @@
+# Optional: offline voiceovers (Piper TTS).
+# install.bat installs this AFTER the core requirements and only warns
+# if it fails — the studio works without it, voiceovers stay off.
+piper-tts==1.8.0
