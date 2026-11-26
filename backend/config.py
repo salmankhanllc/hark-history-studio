@@ -1,4 +1,4 @@
-"""Central configuration for the Hark History Studio local backend.
+"""Central configuration for the History Studio local backend.
 
 Everything is local: no API keys, no cloud services. Paths are resolved
 relative to the project root (the folder that contains backend/).
@@ -36,7 +36,7 @@ OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
 A1111_URL = os.environ.get("A1111_URL", "http://127.0.0.1:7860")
 COMFYUI_URL = os.environ.get("COMFYUI_URL", "http://127.0.0.1:8188")
 
-APP_NAME = "Hark History Studio — Local Backend"
+APP_NAME = "History Studio — Local Backend"
 APP_VERSION = "2.0.0"
 
 
