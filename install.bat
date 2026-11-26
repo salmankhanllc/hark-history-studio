@@ -1,12 +1,12 @@
 @echo off
 REM ============================================================
-REM  Hark History Studio - Local Backend Edition - Installer
+REM  History Studio - Local Backend Edition - Installer
 REM  Tested with Python 3.12.3 (any real Python 3.11+ works).
 REM ============================================================
 setlocal
 cd /d "%~dp0"
 echo.
-echo === Hark History Studio - checking your Python ===
+echo === History Studio - checking your Python ===
 echo.
 
 REM --- Probe for a REAL Python (the Microsoft Store stub does not count) ---
