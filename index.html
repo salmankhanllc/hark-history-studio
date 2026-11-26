@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>Hark History Studio — Portable Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0906; --bg2:#100e09; --panel:#16130c; --panel2:#1c1810; --line:#2e281a; --line2:#453b22;
+  --gold:#c9a227; --gold2:#e8c766; --gold-dim:#8a742a; --ink:#ece5d3; --ink2:#b8ae94; --ink3:#857c62;
+  --red:#d96a5a; --green:#7fb069; --radius:10px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;font-size:15.5px;line-height:1.55}
+button,[role="button"],select,input,textarea{font:inherit}
+button,select,input:not([type="radio"]),textarea{min-height:44px}
+a{color:var(--gold2)}
+h1,h2,h3{font-family:'Cinzel',serif;margin:0;line-height:1.15}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* Masthead */
+.masthead{border-bottom:3px double var(--gold-dim);background:linear-gradient(180deg,#171307,#0a0906);padding:26px 20px 20px;text-align:center}
+.masthead .rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);max-width:760px;margin:0 auto}
+.masthead h1{font-size:clamp(26px,5.4vw,46px);font-weight:900;letter-spacing:.06em;color:#f4ecd4;margin:12px 0 4px}
+.masthead h1 .gold{color:var(--gold2)}
+.mast-top{display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line2);color:var(--gold2);padding:5px 10px;border-radius:999px}
+.badge.solid{background:var(--gold);color:#171204;border-color:var(--gold);font-weight:600}
+.tagline{font-style:italic;color:var(--ink2);max-width:640px;margin:10px auto 12px;font-size:16px}
+.mast-meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase}
+
+/* Tabs */
+.tabs{position:sticky;top:0;z-index:30;background:rgba(10,9,6,.96);border-bottom:1px solid var(--line);display:flex;justify-content:center;gap:4px;padding:8px 10px;flex-wrap:wrap}
+.tab-btn{background:transparent;border:1px solid transparent;color:var(--ink2);padding:10px 22px;min-height:44px;border-radius:8px;cursor:pointer;font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:13.5px}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{background:var(--panel2);border-color:var(--line2);color:var(--gold2)}
+.tab-btn .count{background:var(--gold);color:#171204;border-radius:999px;font-size:11px;padding:1px 7px;margin-left:6px;font-weight:700}
+
+.wrap{max-width:1120px;margin:0 auto;padding:22px 16px 40px}
+section.page{display:none}
+section.page.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card h2{font-size:20px;color:#f4ecd4;margin-bottom:6px}
+.card h3{font-size:15px;font-family:'Archivo',sans-serif;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gold2);margin:18px 0 8px}
+.card p.sub{color:var(--ink2);margin:0 0 14px;font-size:14.5px}
+label.flabel{display:block;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:14px 0 6px}
+input[type="text"],input[type="password"],select,textarea{width:100%;background:#0d0b07;border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:10px 12px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold-dim);outline-offset:1px;border-color:var(--gold)}
+textarea{resize:vertical;min-height:64px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#171204;border:1px solid var(--gold);font-weight:700;padding:11px 20px;border-radius:8px;cursor:pointer;min-height:44px;text-decoration:none}
+.btn:hover{background:var(--gold2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--gold2);border-color:var(--line2)}
+.btn.ghost:hover{border-color:var(--gold);background:var(--panel2)}
+.btn.danger{background:transparent;color:var(--red);border-color:#5a322b}
+.btn.small{padding:7px 13px;min-height:38px;font-size:13.5px}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.statusline{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink2);margin-top:8px;min-height:18px}
+.statusline.ok{color:var(--green)} .statusline.err{color:var(--red)}
+.keyrow{display:flex;gap:8px;align-items:flex-end}
+.keyrow .grow{flex:1}
+.masked{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green)}
+ul.tight{margin:8px 0;padding-left:20px;color:var(--ink2)}
+ul.tight li{margin-bottom:7px}
+ul.tight strong{color:var(--ink)}
+.steps{counter-reset:st;list-style:none;padding:0;margin:10px 0}
+.steps li{counter-increment:st;position:relative;padding:10px 0 10px 46px;border-bottom:1px dashed var(--line);color:var(--ink2)}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(st);position:absolute;left:0;top:8px;width:32px;height:32px;border:1px solid var(--gold-dim);border-radius:50%;color:var(--gold2);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:700}
+.steps li strong{color:var(--ink);display:block}
+.stylepanel{background:#0d0b07;border:1px solid var(--line2);border-left:4px solid var(--gold);border-radius:8px;padding:16px}
+.stylepanel dl{display:grid;grid-template-columns:130px 1fr;gap:6px 14px;margin:0;font-size:14.5px}
+.stylepanel dt{font-weight:700;color:var(--gold2);text-transform:uppercase;font-size:12px;letter-spacing:.07em;padding-top:2px}
+.stylepanel dd{margin:0;color:var(--ink)}
+@media(max-width:560px){.stylepanel dl{grid-template-columns:1fr}.stylepanel dd{margin-bottom:8px}}
+.empty{border:1px dashed var(--line2);border-radius:8px;padding:22px;text-align:center;color:var(--ink3)}
+
+/* Presets */
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+@media(max-width:820px){.presets{grid-template-columns:1fr}}
+.preset{display:block;border:1px solid var(--line2);border-radius:8px;padding:14px;cursor:pointer;background:#0d0b07;min-height:44px}
+.preset input{position:absolute;opacity:0}
+.preset:has(input:checked){border-color:var(--gold);background:#1d1809;box-shadow:0 0 0 1px var(--gold)}
+.preset .pname{font-weight:700;color:#f4ecd4;display:block}
+.preset .pmodel{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gold2);display:block;margin:2px 0 6px}
+.preset .pdesc{font-size:13.5px;color:var(--ink2);display:block}
+
+/* Scenes */
+.scene{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:0;margin-bottom:16px;overflow:hidden}
+.scene-head{display:flex;gap:14px;align-items:flex-start;padding:16px 18px 10px}
+.snum{font-family:'Cinzel',serif;font-weight:900;font-size:26px;color:var(--gold);border:1px solid var(--line2);border-radius:8px;width:52px;height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:center;background:#0d0b07}
+.scene-head h3{font-family:'Cinzel',serif;font-size:18px;text-transform:none;letter-spacing:0;color:#f4ecd4;margin:0}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;border:1px solid var(--line2);border-radius:999px;padding:3px 9px;color:var(--ink2);text-transform:uppercase}
+.chip.firing{border-color:#7a4a20;color:#eda55c}.chip.impact{border-color:#7a2e26;color:#ef8a7a}.chip.aftermath{border-color:#3d5a34;color:#9cc98d}
+.chip.vstat{color:var(--ink3)} .chip.vstat.ready{color:var(--green);border-color:#33512c}.chip.vstat.busy{color:var(--gold2);border-color:var(--gold-dim)}.chip.vstat.failed{color:var(--red);border-color:#5a322b}
+.scene-body{padding:0 18px 18px}
+.scene-body h4{margin:16px 0 6px;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--gold2)}
+.promptbox{background:#0d0b07;border:1px solid var(--line);border-radius:8px;padding:13px 14px;font-size:14px;color:var(--ink);white-space:pre-wrap}
+.narr{font-style:italic;color:var(--ink2);border-left:3px solid var(--gold-dim);padding:4px 0 4px 12px;margin:6px 0}
+.srclinks{display:flex;flex-wrap:wrap;gap:7px}
+.srclinks a{display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border:1px solid var(--line2);border-radius:999px;color:var(--ink);text-decoration:none;font-size:13px;background:#0d0b07}
+.srclinks a:hover{border-color:var(--gold);color:var(--gold2)}
+.recipe{list-style:none;padding:0;margin:6px 0;counter-reset:rc}
+.recipe li{counter-increment:rc;padding:7px 0 7px 34px;position:relative;color:var(--ink2);font-size:14px;border-bottom:1px dashed #241f13}
+.recipe li:last-child{border-bottom:none}
+.recipe li::before{content:"✓";position:absolute;left:0;top:6px;width:24px;height:24px;border-radius:50%;background:#22301b;color:#a9d18e;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.recipe li strong{color:var(--ink)}
+.video-slot{margin-top:12px}
+.video-slot video{width:100%;max-height:420px;background:#000;border-radius:8px;border:1px solid var(--line2)}
+details.more{margin-top:10px}
+details.more summary{cursor:pointer;color:var(--gold2);font-weight:600;min-height:36px;display:flex;align-items:center}
+
+/* Preview */
+.preview-grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+@media(max-width:820px){.preview-grid{grid-template-columns:1fr}.phone{margin:0 auto}}
+.phone{width:300px;max-width:88vw;aspect-ratio:9/16;background:#000;border:1px solid var(--line2);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pbar-top{height:26.2%;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px 12px;gap:5px;border-bottom:1px solid #1c1a14}
+.pwin{height:47.7%;background:#191510;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pwin video{width:100%;height:100%;object-fit:cover}
+.pwin .placeholder{color:var(--ink3);font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:center;padding:14px}
+.pbar-bot{flex:1;background:#000}
+.pt-l1{font-family:'Archivo',sans-serif;font-weight:800;color:#fff;font-size:19px;letter-spacing:.03em;text-transform:uppercase;line-height:1.15}
+.pt-l2{color:var(--gold2);font-weight:700;font-size:14.5px;text-transform:uppercase;letter-spacing:.03em}
+.pt-l3{color:#d8d2c0;font-family:'IBM Plex Mono',monospace;font-size:12px;text-transform:uppercase;min-height:16px}
+.checklist{list-style:none;padding:0;margin:8px 0}
+.checklist li{padding:9px 0 9px 36px;position:relative;border-bottom:1px dashed var(--line);color:var(--ink2)}
+.checklist li:last-child{border-bottom:none}
+.checklist li::before{content:"○";position:absolute;left:2px;top:8px;font-size:17px;color:var(--ink3)}
+.checklist li.pass{color:var(--ink)} .checklist li.pass::before{content:"✓";color:var(--green);font-weight:700}
+.checklist li .note{display:block;font-size:13px;color:var(--ink3)}
+
+/* Library */
+.lib-item{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;flex-wrap:wrap}
+.lib-item .grow{flex:1;min-width:220px}
+.lib-item h3{font-size:17px;color:#f4ecd4}
+.lib-item .meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink3);margin-top:4px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);background:#221c0d;border:1px solid var(--gold-dim);color:var(--ink);padding:12px 20px;border-radius:10px;z-index:60;transition:transform .25s;max-width:92vw;text-align:center;font-size:14.5px}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{border-top:1px solid var(--line);padding:20px 16px 30px;text-align:center;color:var(--ink3);font-size:13.5px}
+footer .fnote{max-width:680px;margin:0 auto}
+.progress{height:8px;background:#0d0b07;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.progress i{display:block;height:100%;background:var(--gold);width:0%}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mast-top">
+    <span class="badge solid">Portable Edition</span>
+    <span class="badge">Version 1.0</span>
+    <span class="badge">Archive-First Studio</span>
+  </div>
+  <div class="rule" style="margin-top:16px"></div>
+  <h1>HARK <span class="gold">HISTORY</span> STUDIO</h1>
+  <p class="tagline">“Every history video should feel like it was shot by the people who lived it.”</p>
+  <div class="rule"></div>
+  <p class="mast-meta" style="margin:12px 0 0">Style-locked scenes · Firing → impact · Combat sound only · 9:16 vertical</p>
+</header>
+
+<nav class="tabs" aria-label="Studio sections">
+  <button class="tab-btn active" data-tab="setup">Setup</button>
+  <button class="tab-btn" data-tab="create">Create</button>
+  <button class="tab-btn" data-tab="library">Library <span class="count" id="libCount">0</span></button>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ SETUP ============ -->
+<section class="page active" id="page-setup">
+  <div class="grid2">
+    <div class="card">
+      <h2>API Keys</h2>
+      <p class="sub">Keys are stored only in this browser (localStorage) and are sent only to the provider you call. Leave a key empty to use the free model and the built-in demo scene engine.</p>
+      <label class="flabel" for="openaiKey">OpenAI API Key — GPT-4o scene writing</label>
+      <div class="keyrow">
+        <div class="grow"><input type="password" id="openaiKey" placeholder="sk-…" autocomplete="off"></div>
+        <button class="btn ghost small" id="clearOpenai" type="button">Clear</button>
+      </div>
+      <div class="statusline" id="openaiStatus">Not saved</div>
+      <label class="flabel" for="falKey">Fal.ai API Key — paid video models</label>
+      <div class="keyrow">
+        <div class="grow"><input type="password" id="falKey" placeholder="Fal key…" autocomplete="off"></div>
+        <button class="btn ghost small" id="clearFal" type="button">Clear</button>
+      </div>
+      <div class="statusline" id="falStatus">Not saved</div>
+      <div class="btnrow">
+        <button class="btn" id="saveKeys" type="button">Save Keys</button>
+      </div>
+      <div class="statusline" id="saveMsg" role="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>Reference Style</h2>
+      <p class="sub">Every scene prompt is locked to one reference style, so a whole reel looks like a single film — never a mix of random generations.</p>
+      <div class="btnrow" style="margin:0 0 14px">
+        <button class="btn" id="loadTemplate" type="button">Load Battle of Britain Template</button>
+        <button class="btn ghost" id="clearStyle" type="button">Clear Style</button>
+      </div>
+      <div id="stylePanel"><div class="empty">No style loaded yet.<br>Load the template, then go to Create.</div></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Why This Isn't a Generic History Video</h2>
+      <ul class="tight">
+        <li><strong>One locked look.</strong> Period colour, film grain and lighting rules are written into every single prompt — clips match each other.</li>
+        <li><strong>Firing → impact, always.</strong> A gun firing is followed immediately by its destruction. No filler, no slow scenic shots.</li>
+        <li><strong>Real sound only.</strong> Each scene carries a combat sound cue synced to the picture — no narration, no music bed.</li>
+        <li><strong>Archive first.</strong> Real archival footage from free sources, enhanced with the studio recipe, beats fake-looking AI footage. AI generation is the fallback, labelled as generated.</li>
+        <li><strong>The locked title format.</strong> Three title lines in the top black bar only — L1 at 0s, L2 (gold) at ~7s, L3 typewriter at ~15.5s. Titles never touch the footage.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>How It Works</h2>
+      <ol class="steps">
+        <li><strong>Load the style</strong>Battle of Britain template above — era, palette, grain and format.</li>
+        <li><strong>Create the breakdown</strong>Topic, hook and date in Create. Scenes are written style-locked, firing → impact, aftermath last.</li>
+        <li><strong>Find or generate each clip</strong>Use the 9 free archive links per scene, or generate with the free SANA model / your Fal key.</li>
+        <li><strong>Enhance &amp; assemble</strong>Follow the 8-step recipe per scene, check the Reel Preview and Quality Checklist, then export the Production Sheet.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CREATE ============ -->
+<section class="page" id="page-create">
+  <div class="card">
+    <h2>Create a Reel</h2>
+    <p class="sub">The three lines become the locked titles: Topic is L1 (white, from 0s), Hook is L2 (gold, ~7s), Date is L3 (typewriter, ~15.5s).</p>
+    <div class="grid2">
+      <div>
+        <label class="flabel" for="fTopic">Topic — Title Line 1</label>
+        <input type="text" id="fTopic" placeholder="e.g. FALL OF DUNKIRK">
+        <label class="flabel" for="fHook">Hook — Title Line 2</label>
+        <input type="text" id="fHook" placeholder="e.g. GREAT ESCAPE IS OVER">
+      </div>
+      <div>
+        <label class="flabel" for="fDate">Date — Title Line 3</label>
+        <input type="text" id="fDate" placeholder="e.g. JUNE 4, 1940">
+        <label class="flabel" for="fDetail">Story detail (optional — place, units, what happened)</label>
+        <textarea id="fDetail" placeholder="e.g. British Expeditionary Force evacuated from the beaches; artillery and Stukas attacking the perimeter…"></textarea>
+      </div>
+    </div>
+    <label class="flabel">Quality Preset — video generation model</label>
+    <div class="presets" role="radiogroup" aria-label="Quality preset">
+      <label class="preset"><input type="radio" name="preset" value="pro"><span class="pname">Professional</span><span class="pmodel">Fal · Kling 2.5 Turbo Pro</span><span class="pdesc">Best motion and period detail. Paid — needs your Fal key with credit.</span></label>
+      <label class="preset"><input type="radio" name="preset" value="standard"><span class="pname">Standard</span><span class="pmodel">Fal · Hailuo-02</span><span class="pdesc">Good quality, lower cost. Paid — needs your Fal key with credit.</span></label>
+      <label class="preset"><input type="radio" name="preset" value="free" checked><span class="pname">Free</span><span class="pmodel">SANA-Video 2.0 · no key</span><span class="pdesc">Free demo model, no key needed. Aircraft and fine detail can drift from history.</span></label>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="genScenes" type="button">Generate Scenes</button>
+      <button class="btn ghost" id="genAll" type="button" disabled>Generate All Videos</button>
+      <button class="btn ghost" id="saveProject" type="button" disabled>Save to Library</button>
+      <button class="btn ghost" id="dlSheet" type="button" disabled>Download Production Sheet</button>
+    </div>
+    <div class="statusline" id="createMsg" role="status"></div>
+    <div class="progress" id="genAllBar" style="display:none"><i></i></div>
+  </div>
+
+  <div class="card" id="previewCard" style="display:none">
+    <h2>Reel Preview &amp; Quality Checklist</h2>
+    <p class="sub">1080×1920 proportions — thick black bars, footage in the middle window, titles only in the top bar on the locked timings.</p>
+    <div class="preview-grid">
+      <div>
+        <div class="phone" aria-label="Reel preview frame">
+          <div class="pbar-top">
+            <div class="pt-l1" id="pvL1"></div>
+            <div class="pt-l2" id="pvL2" style="visibility:hidden"></div>
+            <div class="pt-l3" id="pvL3"></div>
+          </div>
+          <div class="pwin" id="pvWin"><div class="placeholder">Press Play Preview</div></div>
+          <div class="pbar-bot"></div>
+        </div>
+        <div class="btnrow" style="justify-content:center">
+          <button class="btn small" id="pvPlay" type="button">▶ Play Preview</button>
+          <button class="btn ghost small" id="pvStop" type="button">Stop</button>
+        </div>
+        <div class="statusline" id="pvTime" style="text-align:center"></div>
+      </div>
+      <div>
+        <h3 style="margin-top:0">Pre-export Quality Checklist</h3>
+        <ul class="checklist" id="checklist"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="scenes"></div>
+</section>
+
+<!-- ============ LIBRARY ============ -->
+<section class="page" id="page-library">
+  <div class="card">
+    <h2>Library</h2>
+    <p class="sub">Projects saved in this browser. Open one to keep working on it in Create; video URLs are kept with the project.</p>
+    <div id="libList"></div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p class="fnote"><strong>Portable Edition</strong> — runs entirely in your browser; keys and projects stay on this device. Archive clips are real historical footage from the free sources linked per scene; AI-generated clips are labelled as generated in the player. Download this file and open it in any browser — or upgrade it in Google Antigravity.</p>
+  <div class="btnrow" style="justify-content:center"><button class="btn" id="dlSelf" type="button">Download This Studio as One HTML File</button></div>
+  <p class="fnote" style="margin-top:10px">That single file is the whole studio — upload it to a GitHub repo as <span class="mono">index.html</span> and Antigravity can open and upgrade it directly from the repo.</p>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+/* ================= State ================= */
+var LS = { keys:"hark_portable_keys", style:"hark_portable_style", lib:"hark_portable_library", cur:"hark_portable_current" };
+function lsGet(k, d){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+var state = {
+  keys: lsGet(LS.keys, {openai:"", fal:""}),
+  style: lsGet(LS.style, null),
+  library: lsGet(LS.lib, []),
+  project: lsGet(LS.cur, null)
+};
+var BOB_STYLE = {
+  name:"Battle of Britain — Reference Style",
+  era:"Summer 1940, RAF Fighter Command, south-east England",
+  subject:"Period-correct British aircraft, airfields and personnel only — Hurricanes, Spitfires, RAF flying kit",
+  look:"Cinematic period realism shot on virtual 35mm: visible film grain, soft halation on highlights, dust and exhaust haze in the air",
+  colour:"Muted period colour — khaki, slate grey, dull brass, faded sky blue, chalk white — slightly desaturated, warm shadows, no HDR pop",
+  grade:"CLEAR-WHITE grade: bright, clean highlights, lifted whites (gamma ~1.16), never dark or crushed",
+  format:"Vertical 9:16, 1080×1920, action framing, camera at human height",
+  rules:"No drones or aerial establishing shots unless the scene demands it; no modern objects, clothing, signage or aircraft marks; no on-screen text; nothing clean, digital or modern"
+};
+var RECIPE = [
+  ["Restore","hqdn3d denoise (4:3:6) + deinterlace if the source is interlaced; stabilise shake"],
+  ["Upscale","Lanczos upscale to at least 1080 wide for the 9:16 crop"],
+  ["Sharpen","unsharp mask (5:5:0.8) — edges crisp, faces readable"],
+  ["Grade","CLEAR-WHITE grade: gamma ~1.16, gentle contrast S-curve, saturation ~1.05 — bright and clean, never dark/crushed"],
+  ["Smooth","Optional 48fps motion interpolation for the smooth competitor look"],
+  ["Grain","Light uniform grain overlay so old and new clips sit together"],
+  ["Sound","Scene's own combat sound only, synced to the exact frame — no narration, no music"],
+  ["Assemble","Locked title format: L1 white 0s · L2 gold ~7s · L3 typewriter ~15.5s, top black bar only"]
+];
+var SOURCES = [
+  ["Internet Archive", function(q){ return "https://archive.org/search?query=" + encodeURIComponent(q); }],
+  ["Wikimedia Commons", function(q){ return "https://commons.wikimedia.org/w/index.php?search=" + encodeURIComponent(q) + "&title=Special:MediaSearch&type=video"; }],
+  ["PICRYL", function(q){ return "https://picryl.com/search?q=" + encodeURIComponent(q); }],
+  ["NARA Catalog", function(q){ return "https://catalog.archives.gov/search?q=" + encodeURIComponent(q); }],
+  ["DVIDS", function(q){ return "https://www.dvidshub.net/search?q=" + encodeURIComponent(q); }],
+  ["Prelinger Archives", function(q){ return "https://archive.org/search?query=" + encodeURIComponent(q + " collection:prelinger"); }],
+  ["IWM Collections", function(q){ return "https://www.iwm.org.uk/collections/search?query=" + encodeURIComponent(q); }],
+  ["Europeana", function(q){ return "https://www.europeana.eu/en/search?query=" + encodeURIComponent(q); }],
+  ["British Pathé", function(q){ return "https://www.britishpathe.com/search/query/" + encodeURIComponent(q); }]
+];
+var FAL_MODELS = { pro:"fal-ai/kling-video/v2.5-turbo/pro/text-to-video", standard:"fal-ai/minimax/hailuo-02/standard/text-to-video" };
+var SANA_URL = "https://efficient-large-model-sana-video2-5b-720p-demo.hf.space/gradio_api/call/generate";
+
+/* ================= Helpers ================= */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function mask(k){ if(!k) return "Not saved"; return "Saved ····" + k.slice(-4); }
+var toastT=null;
+function toast(msg){ var t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove("show"); }, 3400); }
+function uid(){ return "p" + Date.now().toString(36) + Math.floor(Math.random()*999).toString(36); }
+function saveCur(){ lsSet(LS.cur, state.project); }
+function totalDur(p){ return p ? p.scenes.reduce(function(a,s){ return a + (s.duration||0); },0) : 0; }
+
+/* ================= Tabs ================= */
+document.querySelectorAll(".tab-btn").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.querySelectorAll(".tab-btn").forEach(function(x){ x.classList.remove("active"); });
+    document.querySelectorAll("section.page").forEach(function(x){ x.classList.remove("active"); });
+    b.classList.add("active");
+    $("page-" + b.dataset.tab).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+});
+function goTab(name){ document.querySelector('.tab-btn[data-tab="' + name + '"]').click(); }
+
+/* ================= Setup ================= */
+function renderKeys(){
+  $("openaiStatus").innerHTML = state.keys.openai ? '<span class="masked">' + esc(mask(state.keys.openai)) + '</span>' : "Not saved";
+  $("falStatus").innerHTML = state.keys.fal ? '<span class="masked">' + esc(mask(state.keys.fal)) + '</span>' : "Not saved";
+}
+$("saveKeys").addEventListener("click", function(){
+  var o = $("openaiKey").value.trim(), f = $("falKey").value.trim();
+  if(o) state.keys.openai = o;
+  if(f) state.keys.fal = f;
+  lsSet(LS.keys, state.keys);
+  $("openaiKey").value = ""; $("falKey").value = "";
+  renderKeys();
+  $("saveMsg").textContent = "Keys saved in this browser — they will still be here after a reload.";
+  $("saveMsg").className = "statusline ok";
+  toast("Keys saved");
+});
+$("clearOpenai").addEventListener("click", function(){ state.keys.openai=""; lsSet(LS.keys, state.keys); renderKeys(); toast("OpenAI key cleared"); });
+$("clearFal").addEventListener("click", function(){ state.keys.fal=""; lsSet(LS.keys, state.keys); renderKeys(); toast("Fal key cleared"); });
+
+function renderStyle(){
+  var p = $("stylePanel");
+  if(!state.style){ p.innerHTML = '<div class="empty">No style loaded yet.<br>Load the template, then go to Create.</div>'; return; }
+  var s = state.style;
+  p.innerHTML = '<div class="stylepanel"><dl>'
+    + "<dt>Style</dt><dd><strong>" + esc(s.name) + "</strong></dd>"
+    + "<dt>Era</dt><dd>" + esc(s.era) + "</dd>"
+    + "<dt>Subjects</dt><dd>" + esc(s.subject) + "</dd>"
+    + "<dt>Look</dt><dd>" + esc(s.look) + "</dd>"
+    + "<dt>Colour</dt><dd>" + esc(s.colour) + "</dd>"
+    + "<dt>Grade</dt><dd>" + esc(s.grade) + "</dd>"
+    + "<dt>Format</dt><dd>" + esc(s.format) + "</dd>"
+    + "<dt>Rules</dt><dd>" + esc(s.rules) + "</dd>"
+    + "</dl></div>";
+}
+$("loadTemplate").addEventListener("click", function(){
+  state.style = JSON.parse(JSON.stringify(BOB_STYLE));
+  lsSet(LS.style, state.style);
+  renderStyle();
+  toast("Battle of Britain style loaded — every scene will be locked to it");
+});
+$("clearStyle").addEventListener("click", function(){ state.style=null; lsSet(LS.style,null); renderStyle(); });
+
+/* ================= Scene engine ================= */
+function styleBlock(){
+  var s = state.style || BOB_STYLE;
+  return { era:s.era, look:s.look, colour:s.colour, grade:s.grade, rules:s.rules };
+}
+function buildPrompt(core, st){
+  return "Vertical 9:16, 1080x1920. "
+    + "SUBJECT: " + core.subject + ". "
+    + "ACTION: " + core.action + ". "
+    + "ENVIRONMENT: " + core.environment + ". "
+    + "PERIOD DETAILS: " + core.period + ". "
+    + "LIGHTING: " + core.lighting + ". "
+    + "CAMERA: " + core.camera + ". "
+    + "GRADE: " + st.grade + "; " + st.colour + ". "
+    + "LOOK: " + st.look + ". "
+    + "NEGATIVES: " + st.rules + "; no watermarks, no subtitles, no logos.";
+}
+function demoScenes(topic, hook, date, detail){
+  var T = topic || "UNTITLED BATTLE";
+  var D = detail ? (" Story detail given: " + detail) : "";
+  var st = styleBlock();
+  var raw = [
+    { key:"establish", title:"The Calm Before — Forces Gather", dur:4, shot:"Establishing", kind:"scene",
+      subject:"Period troops and equipment in position, waiting", action:"men scan the sky and horizon, engines idle, tension rising",
+      environment:"the battle location at first light", period:"authentic period uniforms, vehicles and markings throughout",
+      lighting:"low early light through haze", camera:"slow push-in at human height, locked-off feel",
+      narr:"Narration (if used): “" + T.toLowerCase() + " — it began here.” Combat sound only in the final reel.",
+      sound:"Distant engines, wind, faint radio chatter", search:T + " troops waiting footage" },
+    { key:"firing1", title:"Opening Fire — Guns Speak", dur:4, shot:"Firing", kind:"firing",
+      subject:"A period artillery gun / heavy weapon crew in action", action:"the gun FIRES with full recoil and muzzle flash, crew reloading at speed",
+      environment:"gun position, dust and cordite smoke in the air", period:"correct period gun, uniforms and ammunition handling",
+      lighting:"hard daylight, flash lighting the smoke", camera:"tight side angle, slight shake on the shot",
+      narr:"No narration — the gun is the voice of this scene.",
+      sound:"The gun's own blast, exactly on the firing frame, then recoil and reload clatter", search:T + " artillery firing footage" },
+    { key:"impact1", title:"Impact — The Target Is Hit", dur:4, shot:"Impact", kind:"impact",
+      subject:"The target position struck by the shells just fired", action:"a direct hit — explosion, debris and dust thrown high, position destroyed",
+      environment:"the receiving end of the fire, immediately after the firing scene", period:"period structures and vehicles, no modern damage effects",
+      lighting:"blast light then thick dust haze", camera:"locked wide shot so the full destruction reads",
+      narr:"No narration — impact sound carries it.",
+      sound:"Shell arrival whistle cutting straight into the explosion, debris falling", search:T + " explosion impact destruction footage" },
+    { key:"firing2", title:"Second Salvo — Armour Fires", dur:4, shot:"Firing", kind:"firing",
+      subject:"A period tank / armoured vehicle main gun", action:"the tank FIRES, muzzle blast kicking up dust, hull rocking with recoil",
+      environment:"armour advancing or hull-down in the battle area", period:"period-correct tank model, markings and crew kit",
+      lighting:"bright daylight, blast dust lit by sun", camera:"low front three-quarter angle, dust washing over lens",
+      narr:"No narration — engine and gun only.",
+      sound:"Main gun blast synced to the flash, engine roar underneath", search:T + " tank firing footage" },
+    { key:"impact2", title:"Impact — Position Destroyed", dur:5, shot:"Impact", kind:"impact",
+      subject:"A building / strongpoint hit by the tank's fire", action:"the structure is struck and collapses in dust and flame, the biggest destruction of the reel",
+      environment:"the strongpoint at the moment of the hit", period:"period architecture and rubble, no modern materials",
+      lighting:"firelight inside dust cloud", camera:"steady wide shot, hold on the collapse",
+      narr:"No narration — the collapse is the payoff.",
+      sound:"Impact crack then the long rumble of the collapse", search:T + " building destroyed shelling footage" },
+    { key:"aftermath", title:"Aftermath — What Remained", dur:4, shot:"Aftermath", kind:"aftermath",
+      subject:"The battlefield after the fighting — wreckage and silence", action:"smoke drifts over wrecks and rubble, a lone figure walks through frame",
+      environment:"the same location, stilled", period:"abandoned period vehicles and equipment, smoke-blackened",
+      lighting:"pale light through smoke", camera:"very slow lateral move, elegiac and still",
+      narr:"Closing line (if used): “" + (hook || "And then — silence") + ".”",
+      sound:"Wind, distant fire crackle, a single far-off engine fading", search:T + " aftermath wreckage footage" }
+  ];
+  return raw.map(function(r, i){
+    var core = { subject:r.subject, action:r.action, environment:r.environment + ". " + st.era + D, period:r.period, lighting:r.lighting, camera:r.camera };
+    return { id:uid()+i, n:i+1, title:r.title, duration:r.dur, shotType:r.shot, kind:r.kind,
+      camera:r.camera, narration:r.narr, soundCue:r.sound, searchTerm:r.search,
+      prompt:buildPrompt(core, st), videoUrl:"", videoStatus:"none", videoError:"" };
+  });
+}
+async function openaiScenes(topic, hook, date, detail){
+  var key = state.keys.openai;
+  var sys = "You are a history short-form video director. Return ONLY JSON: {\"scenes\":[{title,duration,shotType,kind,camera,narration,soundCue,searchTerm,subject,action,environment,period,lighting}]} with 5-7 scenes. kind is one of firing, impact, aftermath, scene. Every firing scene must be immediately followed by an impact scene; the last scene must be aftermath. Durations 3-6 seconds, total 15-30. Combat sound cues only, no music.";
+  var usr = "Topic (title L1): " + topic + "\nHook (L2): " + hook + "\nDate (L3): " + date + "\nDetail: " + (detail||"") + "\nStyle era: " + styleBlock().era;
+  var res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Bearer " + key },
+    body: JSON.stringify({ model:"gpt-4o", temperature:0.6, response_format:{type:"json_object"}, messages:[{role:"system",content:sys},{role:"user",content:usr}] })
+  });
+  if(!res.ok) throw new Error(res.status === 401 ? "OpenAI key rejected (401) — check the key in Setup." : "OpenAI error " + res.status);
+  var data = await res.json();
+  var parsed = JSON.parse(data.choices[0].message.content);
+  if(!parsed.scenes || !parsed.scenes.length) throw new Error("OpenAI returned no scenes");
+  var st = styleBlock();
+  return parsed.scenes.map(function(r, i){
+    var core = { subject:r.subject||r.title, action:r.action||"", environment:r.environment||"", period:r.period||"", lighting:r.lighting||"", camera:r.camera||"" };
+    return { id:uid()+i, n:i+1, title:r.title||("Scene " + (i+1)), duration:Math.min(8, Math.max(2, r.duration||4)),
+      shotType:r.shotType||"Scene", kind:r.kind||"scene", camera:r.camera||"", narration:r.narration||"",
+      soundCue:r.soundCue||"", searchTerm:r.searchTerm||(topic + " " + (r.title||"")), prompt:buildPrompt(core, st),
+      videoUrl:"", videoStatus:"none", videoError:"" };
+  });
+}
+
+/* ================= Create / render ================= */
+function presetVal(){ var r = document.querySelector('input[name="preset"]:checked'); return r ? r.value : "free"; }
+function presetLabel(v){ return v==="pro" ? "Professional — Fal Kling 2.5 Turbo Pro" : v==="standard" ? "Standard — Fal Hailuo-02" : "Free — SANA-Video 2.0 (no key)"; }
+
+$("genScenes").addEventListener("click", async function(){
+  var topic = $("fTopic").value.trim(), hook = $("fHook").value.trim(), date = $("fDate").value.trim(), detail = $("fDetail").value.trim();
+  var msg = $("createMsg");
+  if(!topic){ msg.textContent = "Give the reel a Topic first — it becomes title line 1."; msg.className = "statusline err"; $("fTopic").focus(); return; }
+  if(!state.style){ state.style = JSON.parse(JSON.stringify(BOB_STYLE)); lsSet(LS.style, state.style); renderStyle(); }
+  var btn = $("genScenes"); btn.disabled = true; btn.textContent = "Writing scenes…";
+  var scenes = null, mode = "demo engine (built-in)";
+  if(state.keys.openai){
+    try { scenes = await openaiScenes(topic, hook, date, detail); mode = "GPT-4o (your OpenAI key)"; }
+    catch(e){ msg.textContent = e.message + " Falling back to the demo engine."; msg.className = "statusline err"; }
+  }
+  if(!scenes) scenes = demoScenes(topic.toUpperCase(), hook, date, detail);
+  state.project = { id:uid(), topic:topic.toUpperCase(), hook:(hook||"").toUpperCase(), date:(date||"").toUpperCase(),
+    detail:detail, preset:presetVal(), styleName:state.style.name, createdAt:new Date().toISOString(), scenes:scenes };
+  saveCur();
+  btn.disabled = false; btn.textContent = "Generate Scenes";
+  msg.textContent = scenes.length + " scenes · " + totalDur(state.project) + "s total · written by " + mode + ", locked to “" + state.style.name + "”.";
+  msg.className = "statusline ok";
+  renderProject();
+  toast("Scene breakdown ready");
+});
+
+function sceneCard(s, idx){
+  var links = SOURCES.map(function(src){ return '<a href="' + esc(src[1](s.searchTerm)) + '" target="_blank" rel="noopener">' + esc(src[0]) + "</a>"; }).join("");
+  var recipe = RECIPE.map(function(r){ return "<li><strong>" + esc(r[0]) + ".</strong> " + esc(r[1]) + "</li>"; }).join("");
+  var vstat = s.videoStatus==="ready" ? '<span class="chip vstat ready">Video ready</span>'
+    : s.videoStatus==="busy" ? '<span class="chip vstat busy">Generating…</span>'
+    : s.videoStatus==="failed" ? '<span class="chip vstat failed">Failed</span>'
+    : '<span class="chip vstat">No video yet</span>';
+  var videoHtml = "";
+  if(s.videoStatus==="ready" && s.videoUrl){
+    videoHtml = '<div class="video-slot"><video controls preload="metadata" src="' + esc(s.videoUrl) + '"></video>'
+      + '<div class="btnrow"><a class="btn small" href="' + esc(s.videoUrl) + '" download target="_blank" rel="noopener">Download clip</a>'
+      + '<span class="statusline">AI-generated clip — not archival footage.</span></div></div>';
+  } else if(s.videoStatus==="failed"){
+    videoHtml = '<div class="statusline err">' + esc(s.videoError || "Generation failed.") + "</div>";
+  } else if(s.videoStatus==="busy"){
+    videoHtml = '<div class="statusline">Generating — live status: <span class="mono" data-role="vstatus">working…</span></div><div class="progress"><i data-role="vbar" style="width:15%"></i></div>';
+  }
+  return '<article class="scene" data-scene="' + s.id + '">'
+    + '<div class="scene-head"><div class="snum">' + (idx+1) + '</div><div style="flex:1;min-width:200px">'
+    + "<h3>" + esc(s.title) + '</h3><div class="badges">'
+    + '<span class="chip ' + esc(s.kind) + '">' + esc(s.shotType) + "</span>"
+    + '<span class="chip">' + s.duration + 's</span>'
+    + '<span class="chip">' + esc(s.camera) + "</span>" + vstat
+    + "</div></div></div>"
+    + '<div class="scene-body">'
+    + "<h4>Ready-to-shoot video prompt</h4><div class=\"promptbox\">" + esc(s.prompt) + "</div>"
+    + (s.narration ? "<h4>Narration / note</h4><p class=\"narr\">" + esc(s.narration) + "</p>" : "")
+    + "<h4>Sound cue — combat only, synced</h4><p style=\"margin:4px 0;color:var(--ink2)\">" + esc(s.soundCue) + "</p>"
+    + "<h4>Find free archival clips — “" + esc(s.searchTerm) + "”</h4><div class=\"srclinks\">" + links + "</div>"
+    + '<details class="more"><summary>Quality-enhance recipe — 8 steps</summary><ol class="recipe">' + recipe + "</ol></details>"
+    + '<div class="btnrow"><button class="btn" type="button" data-act="gen" data-id="' + s.id + '"' + (s.videoStatus==="busy" ? " disabled" : "") + ">"
+    + (s.videoStatus==="ready" ? "Regenerate Video" : "Generate Video") + "</button>"
+    + '<span class="statusline">' + esc(presetLabel(state.project ? state.project.preset : presetVal())) + "</span></div>"
+    + videoHtml
+    + "</div></article>";
+}
+function renderProject(){
+  var p = state.project;
+  var has = !!p;
+  $("genAll").disabled = !has; $("saveProject").disabled = !has; $("dlSheet").disabled = !has;
+  $("previewCard").style.display = has ? "block" : "none";
+  $("scenes").innerHTML = has ? p.scenes.map(sceneCard).join("") : "";
+  if(has){ renderPreviewTitles(0); renderChecklist(); }
+  document.querySelectorAll('[data-act="gen"]').forEach(function(b){
+    b.addEventListener("click", function(){ generateVideo(b.dataset.id); });
+  });
+}
+function renderChecklist(){
+  var p = state.project; if(!p) return;
+  var items = [];
+  var titlesSet = !!(p.topic && p.hook && p.date);
+  items.push([titlesSet, "All three titles set", "L1 “" + (p.topic||"—") + "” · L2 “" + (p.hook||"—") + "” · L3 “" + (p.date||"—") + "”"]);
+  items.push([titlesSet, "Titles timed to the lock", "L1 from 0s · L2 gold at ~7s · L3 typewriter from ~15.5s — top bar only"]);
+  var orderOk = false;
+  for(var i=0;i<p.scenes.length-1;i++){ if(p.scenes[i].kind==="firing" && p.scenes[i+1].kind==="impact") orderOk = true; }
+  var lastOk = p.scenes.length && p.scenes[p.scenes.length-1].kind==="aftermath";
+  items.push([orderOk && !!lastOk, "Firing → impact order, aftermath last", orderOk ? (lastOk ? "At least one firing scene is followed immediately by its impact." : "Firing→impact found, but the last scene is not aftermath.") : "No firing scene is immediately followed by an impact scene."]);
+  items.push([p.scenes.every(function(s){ return !!s.soundCue; }), "Sound cue on every clip", "Combat sound only — no narration, no music"]);
+  var d = totalDur(p);
+  items.push([d>=15 && d<=30, "Runtime 15–30 seconds", "Current total: " + d + "s across " + p.scenes.length + " clips"]);
+  items.push([p.scenes.every(function(s){ return s.prompt && s.prompt.length>80; }), "Full 8-part prompt on every scene", "Subject, action, environment, period, lighting, camera, CLEAR-WHITE grade, negatives"]);
+  var ready = p.scenes.filter(function(s){ return s.videoStatus==="ready"; }).length;
+  items.push([ready===p.scenes.length && ready>0, "Videos rendered — " + ready + " / " + p.scenes.length, ready===p.scenes.length ? "Every clip has a generated video (or use archival clips per scene)." : "Generate clips above, or shoot from the free archive links."]);
+  $("checklist").innerHTML = items.map(function(it){
+    return '<li class="' + (it[0] ? "pass" : "") + '"><strong>' + esc(it[1]) + '</strong><span class="note">' + esc(it[2]) + "</span></li>";
+  }).join("");
+}
+
+/* ================= Reel Preview ================= */
+var pvTimer = null, pvStart = 0, typeTimer = null;
+function renderPreviewTitles(elapsed){
+  var p = state.project; if(!p) return;
+  $("pvL1").textContent = p.topic || "";
+  var l2 = $("pvL2");
+  l2.textContent = p.hook || "";
+  l2.style.visibility = elapsed >= 7 ? "visible" : "hidden";
+  var l3 = $("pvL3");
+  if(elapsed >= 15.5 && p.date){
+    var chars = Math.min(p.date.length, Math.floor((elapsed - 15.5) * 14));
+    l3.textContent = p.date.slice(0, chars);
+  } else l3.textContent = "";
+  $("pvTime").textContent = p ? ("t = " + elapsed.toFixed(1) + "s / " + totalDur(p) + "s") : "";
+}
+function pvShowScene(elapsed){
+  var p = state.project; if(!p) return;
+  var acc = 0, cur = p.scenes[p.scenes.length-1];
+  for(var i=0;i<p.scenes.length;i++){ if(elapsed < acc + p.scenes[i].duration){ cur = p.scenes[i]; break; } acc += p.scenes[i].duration; }
+  var win = $("pvWin");
+  if(cur.videoStatus==="ready" && cur.videoUrl){
+    if(!win.querySelector("video") || win.querySelector("video").dataset.sid !== cur.id){
+      win.innerHTML = '<video data-sid="' + cur.id + '" src="' + esc(cur.videoUrl) + '" autoplay muted loop playsinline></video>';
+    }
+  } else {
+    win.innerHTML = '<div class="placeholder">SCENE ' + cur.n + " — " + esc(cur.title.toUpperCase()) + "<br>" + esc(cur.shotType) + " · " + cur.duration + "s<br><br>" + (cur.videoStatus==="ready" ? "" : "No generated clip yet —<br>archive link or Generate Video") + "</div>";
+  }
+}
+$("pvPlay").addEventListener("click", function(){
+  var p = state.project; if(!p) return;
+  pvStopFn();
+  pvStart = Date.now();
+  pvShowScene(0); renderPreviewTitles(0);
+  pvTimer = setInterval(function(){
+    var el = (Date.now() - pvStart) / 1000;
+    if(el >= totalDur(p)){ pvStopFn(); renderPreviewTitles(totalDur(p)); pvShowScene(totalDur(p) - 0.01); $("pvTime").textContent = "Preview finished — " + totalDur(p) + "s"; return; }
+    renderPreviewTitles(el); pvShowScene(el);
+  }, 100);
+});
+function pvStopFn(){ if(pvTimer){ clearInterval(pvTimer); pvTimer = null; } }
+$("pvStop").addEventListener("click", function(){ pvStopFn(); renderPreviewTitles(0); $("pvWin").innerHTML = '<div class="placeholder">Press Play Preview</div>'; });
+
+/* ================= Video generation ================= */
+function setSceneVideo(id, patch){
+  var p = state.project; if(!p) return;
+  var s = p.scenes.find(function(x){ return x.id===id; }); if(!s) return;
+  Object.assign(s, patch); saveCur(); renderProject();
+}
+function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+async function genSANA(s){
+  var durStr = s.duration <= 5 ? "5 seconds" : "8 seconds";
+  var seed = Math.floor(Math.random()*100000);
+  var res = await fetch(SANA_URL, { method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ data:[s.prompt, durStr, 0.7, 20, seed, true] }) });
+  if(!res.ok) throw new Error("Free SANA demo did not accept the job (HTTP " + res.status + "). It may be busy — try again in a minute.");
+  var j = await res.json();
+  var eventId = j.event_id;
+  if(!eventId) throw new Error("Free SANA demo returned no job id — it may be busy. Try again.");
+  for(var i=0;i<45;i++){
+    await sleep(4000);
+    var r = await fetch(SANA_URL + "/" + eventId);
+    var text = await r.text();
+    if(text.indexOf("event: error") !== -1 || /quota|GPU.*(quota|limit)/i.test(text))
+      throw new Error("The free SANA demo is at its GPU quota right now — no video was made. Try again later, or use a Fal preset with your key.");
+    if(text.indexOf("event: complete") !== -1){
+      var m = text.match(/data:\s*(\[.*\])/s);
+      if(m){ var arr = JSON.parse(m[1]); if(arr && arr[0] && arr[0].url) return arr[0].url; }
+      throw new Error("SANA finished but returned no video file.");
+    }
+  }
+  throw new Error("SANA took too long (over 3 minutes) — job abandoned. Try again.");
+}
+async function genFal(s, preset){
+  var key = state.keys.fal;
+  if(!key) throw new Error("No Fal.ai key saved — add it in Setup, or switch the preset to Free (SANA).");
+  var model = FAL_MODELS[preset];
+  var res = await fetch("https://queue.fal.run/" + model, { method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Key " + key },
+    body: JSON.stringify({ prompt:s.prompt, aspect_ratio:"9:16", duration:"5" }) });
+  if(res.status===401 || res.status===403) throw new Error("Fal rejected the key (auth error) — check the key and its credit in Setup.");
+  if(!res.ok) throw new Error("Fal queue error (HTTP " + res.status + ").");
+  var j = await res.json();
+  var statusUrl = j.status_url, responseUrl = j.response_url;
+  if(!statusUrl || !responseUrl) throw new Error("Fal returned no status URL.");
+  for(var i=0;i<60;i++){
+    await sleep(4000);
+    var sr = await fetch(statusUrl, { headers:{ "Authorization":"Key " + key } });
+    var sj = await sr.json();
+    if(sj.status==="COMPLETED"){
+      var rr = await fetch(responseUrl, { headers:{ "Authorization":"Key " + key } });
+      var rj = await rr.json();
+      var url = rj.video && rj.video.url ? rj.video.url : (rj.video_url || "");
+      if(url) return url;
+      throw new Error("Fal finished but returned no video URL.");
+    }
+    if(sj.status==="FAILED") throw new Error("Fal generation failed on their side — no video was made.");
+  }
+  throw new Error("Fal took too long (over 4 minutes) — job abandoned.");
+}
+async function generateVideo(id){
+  var p = state.project; if(!p) return;
+  var s = p.scenes.find(function(x){ return x.id===id; }); if(!s || s.videoStatus==="busy") return;
+  setSceneVideo(id, { videoStatus:"busy", videoError:"" });
+  try {
+    var url = p.preset==="free" ? await genSANA(s) : await genFal(s, p.preset);
+    setSceneVideo(id, { videoStatus:"ready", videoUrl:url, videoError:"" });
+    toast("Clip ready — Scene " + s.n);
+  } catch(e){
+    setSceneVideo(id, { videoStatus:"failed", videoError:e.message || "Generation failed." });
+    toast("Scene " + s.n + " failed — see the message on its card");
+  }
+  renderChecklist();
+}
+$("genAll").addEventListener("click", async function(){
+  var p = state.project; if(!p) return;
+  var btn = $("genAll"); btn.disabled = true;
+  var bar = $("genAllBar"); bar.style.display = "block";
+  var todo = p.scenes.filter(function(s){ return s.videoStatus!=="ready"; });
+  var done = p.scenes.length - todo.length;
+  for(var i=0;i<todo.length;i++){
+    await generateVideo(todo[i].id);
+    done++;
+    bar.querySelector("i").style.width = Math.round(done / p.scenes.length * 100) + "%";
+  }
+  btn.disabled = false;
+  toast("Generate All finished — check each scene card");
+});
+
+/* ================= Library ================= */
+function renderLibrary(){
+  $("libCount").textContent = state.library.length;
+  var el = $("libList");
+  if(!state.library.length){ el.innerHTML = '<div class="empty">Library is empty.<br>Create a breakdown in Create and press “Save to Library”.</div>'; return; }
+  el.innerHTML = state.library.map(function(p){
+    var ready = p.scenes.filter(function(s){ return s.videoStatus==="ready"; }).length;
+    return '<div class="lib-item"><div class="grow"><h3>' + esc(p.topic) + "</h3>"
+      + '<div class="meta">' + esc(p.hook || "") + (p.date ? " · " + esc(p.date) : "") + "</div>"
+      + '<div class="meta">' + p.scenes.length + " scenes · " + totalDur(p) + "s · " + ready + " videos · " + esc(presetLabel(p.preset)) + " · saved " + esc(new Date(p.createdAt).toLocaleString()) + "</div></div>"
+      + '<div class="btnrow" style="margin:0"><button class="btn small" data-open="' + p.id + '">Open</button>'
+      + '<button class="btn danger small" data-del="' + p.id + '">Delete</button></div></div>';
+  }).join("");
+  el.querySelectorAll("[data-open]").forEach(function(b){ b.addEventListener("click", function(){
+    var p = state.library.find(function(x){ return x.id===b.dataset.open; }); if(!p) return;
+    state.project = JSON.parse(JSON.stringify(p)); saveCur();
+    $("fTopic").value = p.topic; $("fHook").value = p.hook; $("fDate").value = p.date; $("fDetail").value = p.detail || "";
+    var r = document.querySelector('input[name="preset"][value="' + p.preset + '"]'); if(r) r.checked = true;
+    renderProject(); goTab("create"); toast("Project opened in Create");
+  }); });
+  el.querySelectorAll("[data-del]").forEach(function(b){ b.addEventListener("click", function(){
+    if(b.dataset.armed){ state.library = state.library.filter(function(x){ return x.id!==b.dataset.del; });
+      lsSet(LS.lib, state.library); renderLibrary(); toast("Project deleted"); }
+    else { b.dataset.armed = "1"; b.textContent = "Confirm delete?"; setTimeout(function(){ if(b.isConnected){ delete b.dataset.armed; b.textContent = "Delete"; } }, 3000); }
+  }); });
+}
+$("saveProject").addEventListener("click", function(){
+  var p = state.project; if(!p) return;
+  var copy = JSON.parse(JSON.stringify(p));
+  var ix = state.library.findIndex(function(x){ return x.id===copy.id; });
+  if(ix >= 0) state.library[ix] = copy; else state.library.unshift(copy);
+  lsSet(LS.lib, state.library); renderLibrary();
+  toast("Saved to Library");
+});
+
+/* ================= Production Sheet ================= */
+function sheetHTML(p){
+  var rows = p.scenes.map(function(s){
+    var links = SOURCES.map(function(src){ return '<a href="' + esc(src[1](s.searchTerm)) + '">' + esc(src[0]) + "</a>"; }).join(" · ");
+    return "<tr><td>" + s.n + "</td><td><strong>" + esc(s.title) + "</strong><br>" + esc(s.shotType) + " · " + s.duration + "s · " + esc(s.camera)
+      + "<br><em>" + esc(s.prompt) + "</em><br>Sound: " + esc(s.soundCue)
+      + "<br>Archive search “" + esc(s.searchTerm) + "”: " + links
+      + "<br>Status: " + (s.videoStatus==="ready" ? "Video ready — " + esc(s.videoUrl) : s.videoStatus) + "</td></tr>";
+  }).join("");
+  var recipe = RECIPE.map(function(r, i){ return "<li><strong>Step " + (i+1) + " — " + esc(r[0]) + ".</strong> " + esc(r[1]) + "</li>"; }).join("");
+  return "<!doctype html><html><head><meta charset='utf-8'><title>Production Sheet — " + esc(p.topic) + "</title>"
+    + "<style>body{font-family:Georgia,serif;max-width:820px;margin:30px auto;padding:0 18px;color:#1a1a1a}h1{font-size:26px}table{border-collapse:collapse;width:100%}td{border:1px solid #999;padding:9px;vertical-align:top;font-size:13.5px}em{color:#444}.gold{color:#8a6d00}</style></head><body>"
+    + "<h1>HARK HISTORY STUDIO — Production Sheet</h1>"
+    + "<p><strong>Project:</strong> " + esc(p.topic) + "<br><strong>Style:</strong> " + esc(p.styleName) + "<br><strong>Preset:</strong> " + esc(presetLabel(p.preset))
+    + "<br><strong>Runtime:</strong> " + totalDur(p) + "s · " + p.scenes.length + " clips · Format 1080×1920 (9:16) · Combat sound only</p>"
+    + "<h2>Titles — locked timings</h2><table>"
+    + "<tr><td>L1 — 0s, white, largest</td><td><strong>" + esc(p.topic) + "</strong></td></tr>"
+    + "<tr><td>L2 — ~7s, <span class='gold'>gold</span></td><td><strong>" + esc(p.hook) + "</strong></td></tr>"
+    + "<tr><td>L3 — ~15.5s, typewriter</td><td><strong>" + esc(p.date) + "</strong></td></tr></table>"
+    + "<h2>Scenes — firing → impact, aftermath last</h2><table>" + rows + "</table>"
+    + "<h2>Quality-enhance recipe (archive clips)</h2><ol>" + recipe + "</ol>"
+    + "<p>Generated " + esc(new Date().toLocaleString()) + " · Hark History Studio — Portable Edition</p></body></html>";
+}
+$("dlSheet").addEventListener("click", function(){
+  var p = state.project; if(!p) return;
+  var blob = new Blob([sheetHTML(p)], { type:"text/html" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hark-production-sheet-" + p.topic.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".html";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  toast("Production Sheet downloaded");
+});
+
+/* ================= Download this file ================= */
+$("dlSelf").addEventListener("click", function(){
+  var html = "<!doctype html>\n" + document.documentElement.outerHTML;
+  var blob = new Blob([html], { type:"text/html" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hark-history-studio-portable.html";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  toast("Studio file downloaded — one self-contained HTML");
+});
+
+/* ================= Init ================= */
+renderKeys(); renderStyle(); renderLibrary();
+if(state.project){
+  var p = state.project;
+  $("fTopic").value = p.topic || ""; $("fHook").value = p.hook || ""; $("fDate").value = p.date || ""; $("fDetail").value = p.detail || "";
+  var r = document.querySelector('input[name="preset"][value="' + p.preset + '"]'); if(r) r.checked = true;
+  p.scenes.forEach(function(s){ if(s.videoStatus==="busy"){ s.videoStatus = "none"; } });
+  renderProject();
+} else { renderProject(); }
+document.querySelectorAll('input[name="preset"]').forEach(function(r){
+  r.addEventListener("change", function(){ if(state.project){ state.project.preset = presetVal(); saveCur(); renderProject(); } });
+});
+</script>
+</body>
+</html>
