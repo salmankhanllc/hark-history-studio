@@ -1,14 +1,13 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="color-scheme" content="dark" />
-<link rel="icon" href="data:," />
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
 <title>Hark History Studio — Portable Edition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&amp;family=Archivo:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0a0906; --bg2:#100e09; --panel:#16130c; --panel2:#1c1810; --line:#2e281a; --line2:#453b22;
@@ -54,6 +53,7 @@ section.page.active{display:block}
 .card p.sub{color:var(--ink2);margin:0 0 14px;font-size:14.5px}
 label.flabel{display:block;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:14px 0 6px}
 input[type="text"],input[type="password"],select,textarea{width:100%;background:#0d0b07;border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:10px 12px}
+input[type=file]{max-width:100%}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--gold-dim);outline-offset:1px;border-color:var(--gold)}
 textarea{resize:vertical;min-height:64px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#171204;border:1px solid var(--gold);font-weight:700;padding:11px 20px;border-radius:8px;cursor:pointer;min-height:44px;text-decoration:none}
@@ -256,16 +256,18 @@ footer .fnote{max-width:680px;margin:0 auto}
     <div class="presets" role="radiogroup" aria-label="Quality preset">
       <label class="preset"><input type="radio" name="preset" value="pro"><span class="pname">Professional</span><span class="pmodel">Fal · Kling 2.5 Turbo Pro</span><span class="pdesc">Best motion and period detail. Paid — needs your Fal key with credit.</span></label>
       <label class="preset"><input type="radio" name="preset" value="standard"><span class="pname">Standard</span><span class="pmodel">Fal · Hailuo-02</span><span class="pdesc">Good quality, lower cost. Paid — needs your Fal key with credit.</span></label>
-      <label class="preset"><input type="radio" name="preset" value="free" checked><span class="pname">Free</span><span class="pmodel">SANA-Video 2.0 · no key</span><span class="pdesc">Free demo model, no key needed. Aircraft and fine detail can drift from history.</span></label>
+      <label class="preset"><input type="radio" name="preset" value="free" checked=""><span class="pname">Free</span><span class="pmodel">SANA-Video 2.0 · no key</span><span class="pdesc">Free demo model, no key needed. Aircraft and fine detail can drift from history.</span></label>
     </div>
     <div class="btnrow">
       <button class="btn" id="genScenes" type="button">Generate Scenes</button>
-      <button class="btn ghost" id="genAll" type="button" disabled>Generate All Videos</button>
-      <button class="btn ghost" id="saveProject" type="button" disabled>Save to Library</button>
-      <button class="btn ghost" id="dlSheet" type="button" disabled>Download Production Sheet</button>
+      <button class="btn ghost" id="genAll" type="button" disabled="">Generate All Videos</button>
+      <button class="btn ghost" id="saveProject" type="button" disabled="">Save to Library</button>
+      <button class="btn ghost" id="dlSheet" type="button" disabled="">Download Production Sheet</button>
+      <button class="btn" id="exportReel" type="button" disabled="">Export Final Reel (WebM)</button>
     </div>
     <div class="statusline" id="createMsg" role="status"></div>
     <div class="progress" id="genAllBar" style="display:none"><i></i></div>
+    <div class="statusline" id="exportStatus" role="status">Export uses your selected scene clips and the locked title layout. Browser export is WebM; audio is not mixed in this version.</div>
   </div>
 
   <div class="card" id="previewCard" style="display:none">
@@ -303,7 +305,7 @@ footer .fnote{max-width:680px;margin:0 auto}
   <div class="card">
     <h2>Library</h2>
     <p class="sub">Projects saved in this browser. Open one to keep working on it in Create; video URLs are kept with the project.</p>
-    <div id="libList"></div>
+    <div id="libList"><div class="empty">Library is empty.<br>Create a breakdown in Create and press “Save to Library”.</div></div>
   </div>
 </section>
 
@@ -323,6 +325,7 @@ footer .fnote{max-width:680px;margin:0 auto}
 var LS = { keys:"hark_portable_keys", style:"hark_portable_style", lib:"hark_portable_library", cur:"hark_portable_current" };
 function lsGet(k, d){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+var archiveFiles = Object.create(null); // Local object URLs; source files remain on this device.
 var state = {
   keys: lsGet(LS.keys, {openai:"", fal:""}),
   style: lsGet(LS.style, null),
@@ -571,6 +574,10 @@ function sceneCard(s, idx){
     + (s.narration ? "<h4>Narration / note</h4><p class=\"narr\">" + esc(s.narration) + "</p>" : "")
     + "<h4>Sound cue — combat only, synced</h4><p style=\"margin:4px 0;color:var(--ink2)\">" + esc(s.soundCue) + "</p>"
     + "<h4>Find free archival clips — “" + esc(s.searchTerm) + "”</h4><div class=\"srclinks\">" + links + "</div>"
+    + '<h4>Upload archival / licensed footage for this scene</h4>'
+    + '<input type="file" accept="video/*" data-archive="' + s.id + '" style="width:100%;color:var(--ink2);padding:8px;background:#0d0b07;border:1px solid var(--line2);border-radius:8px">'
+    + (s.archiveName ? '<div class="statusline ok">Selected: ' + esc(s.archiveName) + ' · ' + (archiveFiles[s.id] ? 'ready in this session' : 're-upload after reopening') + '</div>' : '<div class="statusline">No personal footage selected. Generate a clip or upload archive footage.</div>')
+    + (archiveFiles[s.id] ? '<div class="video-slot"><video controls preload="metadata" src="' + esc(archiveFiles[s.id]) + '"></video></div>' : '')
     + '<details class="more"><summary>Quality-enhance recipe — 8 steps</summary><ol class="recipe">' + recipe + "</ol></details>"
     + '<div class="btnrow"><button class="btn" type="button" data-act="gen" data-id="' + s.id + '"' + (s.videoStatus==="busy" ? " disabled" : "") + ">"
     + (s.videoStatus==="ready" ? "Regenerate Video" : "Generate Video") + "</button>"
@@ -581,12 +588,24 @@ function sceneCard(s, idx){
 function renderProject(){
   var p = state.project;
   var has = !!p;
-  $("genAll").disabled = !has; $("saveProject").disabled = !has; $("dlSheet").disabled = !has;
+  $("genAll").disabled = !has; $("saveProject").disabled = !has; $("dlSheet").disabled = !has; $("exportReel").disabled = !has;
   $("previewCard").style.display = has ? "block" : "none";
   $("scenes").innerHTML = has ? p.scenes.map(sceneCard).join("") : "";
   if(has){ renderPreviewTitles(0); renderChecklist(); }
   document.querySelectorAll('[data-act="gen"]').forEach(function(b){
     b.addEventListener("click", function(){ generateVideo(b.dataset.id); });
+  });
+  document.querySelectorAll('[data-archive]').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      var f = inp.files && inp.files[0]; if(!f) return;
+      if(!f.type.startsWith('video/')) { toast('Please choose a video file.'); return; }
+      var id = inp.dataset.archive;
+      if(archiveFiles[id]) URL.revokeObjectURL(archiveFiles[id]);
+      archiveFiles[id] = URL.createObjectURL(f);
+      var sc = state.project && state.project.scenes.find(function(x){ return x.id===id; });
+      if(sc){ sc.archiveName = f.name; saveCur(); }
+      renderProject(); toast('Footage attached to scene ' + (sc ? sc.n : ''));
+    });
   });
 }
 function renderChecklist(){
@@ -603,8 +622,8 @@ function renderChecklist(){
   var d = totalDur(p);
   items.push([d>=15 && d<=30, "Runtime 15–30 seconds", "Current total: " + d + "s across " + p.scenes.length + " clips"]);
   items.push([p.scenes.every(function(s){ return s.prompt && s.prompt.length>80; }), "Full 8-part prompt on every scene", "Subject, action, environment, period, lighting, camera, CLEAR-WHITE grade, negatives"]);
-  var ready = p.scenes.filter(function(s){ return s.videoStatus==="ready"; }).length;
-  items.push([ready===p.scenes.length && ready>0, "Videos rendered — " + ready + " / " + p.scenes.length, ready===p.scenes.length ? "Every clip has a generated video (or use archival clips per scene)." : "Generate clips above, or shoot from the free archive links."]);
+  var ready = p.scenes.filter(function(s){ return !!archiveFiles[s.id] || (s.videoStatus==="ready" && !!s.videoUrl); }).length;
+  items.push([ready===p.scenes.length && ready>0, "Scene footage ready — " + ready + " / " + p.scenes.length, ready===p.scenes.length ? "Every scene has an uploaded archive clip or generated video." : "Upload licensed archival footage or generate the remaining clips."]);
   $("checklist").innerHTML = items.map(function(it){
     return '<li class="' + (it[0] ? "pass" : "") + '"><strong>' + esc(it[1]) + '</strong><span class="note">' + esc(it[2]) + "</span></li>";
   }).join("");
@@ -630,9 +649,10 @@ function pvShowScene(elapsed){
   var acc = 0, cur = p.scenes[p.scenes.length-1];
   for(var i=0;i<p.scenes.length;i++){ if(elapsed < acc + p.scenes[i].duration){ cur = p.scenes[i]; break; } acc += p.scenes[i].duration; }
   var win = $("pvWin");
-  if(cur.videoStatus==="ready" && cur.videoUrl){
+  var clipSrc = archiveFiles[cur.id] || (cur.videoStatus==="ready" ? cur.videoUrl : "");
+  if(clipSrc){
     if(!win.querySelector("video") || win.querySelector("video").dataset.sid !== cur.id){
-      win.innerHTML = '<video data-sid="' + cur.id + '" src="' + esc(cur.videoUrl) + '" autoplay muted loop playsinline></video>';
+      win.innerHTML = '<video data-sid="' + cur.id + '" src="' + esc(clipSrc) + '" autoplay muted loop playsinline></video>';
     }
   } else {
     win.innerHTML = '<div class="placeholder">SCENE ' + cur.n + " — " + esc(cur.title.toUpperCase()) + "<br>" + esc(cur.shotType) + " · " + cur.duration + "s<br><br>" + (cur.videoStatus==="ready" ? "" : "No generated clip yet —<br>archive link or Generate Video") + "</div>";
@@ -738,6 +758,53 @@ $("genAll").addEventListener("click", async function(){
   toast("Generate All finished — check each scene card");
 });
 
+/* ================= Final Reel Export (browser WebM) ================= */
+function waitForEvent(el, name){ return new Promise(function(resolve,reject){
+  var done=false; function clean(){el.removeEventListener(name,ok);el.removeEventListener('error',bad);}
+  function ok(){if(done)return;done=true;clean();resolve();} function bad(){if(done)return;done=true;clean();reject(new Error('A selected clip could not be decoded.'));}
+  el.addEventListener(name,ok,{once:true});el.addEventListener('error',bad,{once:true});
+}); }
+$("exportReel").addEventListener('click', async function(){
+  var p=state.project; if(!p || !p.scenes.length) return;
+  if(!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream){ toast('This browser does not support video export. Please use a recent Chrome or Edge.'); return; }
+  var missing=p.scenes.filter(function(sc){return !archiveFiles[sc.id] && !(sc.videoStatus==='ready' && sc.videoUrl);});
+  if(missing.length){ toast('Attach footage or generate a clip for every scene before export.'); return; }
+  var btn=$("exportReel"); btn.disabled=true; $("exportStatus").textContent='Preparing your final reel… keep this tab open until export finishes.';
+  var canvas=document.createElement('canvas'); canvas.width=1080; canvas.height=1920;
+  var ctx=canvas.getContext('2d'); var stream=canvas.captureStream(30);
+  var mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+  var recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:8000000}); var chunks=[];
+  recorder.ondataavailable=function(e){if(e.data && e.data.size) chunks.push(e.data);};
+  var finished=new Promise(function(resolve,reject){recorder.onstop=resolve;recorder.onerror=function(){reject(new Error('Browser recorder failed.'));};});
+  var v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto';
+  function drawFrame(t, clip){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,1080,1920);
+    // letterbox title zone and footage window match the studio's reference composition
+    ctx.fillStyle='#050505';ctx.fillRect(0,0,1080,500);ctx.fillRect(0,1458,1080,462);
+    if(clip && v.readyState>=2){var scale=Math.max(1080/v.videoWidth,958/v.videoHeight);var w=v.videoWidth*scale,h=v.videoHeight*scale;ctx.drawImage(v,(1080-w)/2,500+(958-h)/2,w,h);}
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.font='800 66px Arial';wrapText(ctx,p.topic.toUpperCase(),540,135,940,76,2);
+    if(t>=7){ctx.fillStyle='#e8c766';ctx.font='700 48px Arial';wrapText(ctx,p.hook.toUpperCase(),540,300,940,58,2);}
+    if(t>=15.5){var n=Math.min(p.date.length,Math.floor((t-15.5)*14));ctx.fillStyle='#d8d2c0';ctx.font='32px monospace';ctx.fillText(p.date.toUpperCase().slice(0,n),540,420);}
+  }
+  function wrapText(c,text,x,y,maxW,lineH,maxLines){var words=text.split(/\s+/),line='',lines=[];words.forEach(function(w){var test=line?line+' '+w:w;if(c.measureText(test).width>maxW && line){lines.push(line);line=w;}else line=test;});if(line)lines.push(line);lines=lines.slice(0,maxLines);var start=y-(lines.length-1)*lineH/2;lines.forEach(function(l,i){c.fillText(l,x,start+i*lineH);});}
+  try{
+    recorder.start();var elapsed=0;drawFrame(0,false);
+    for(var i=0;i<p.scenes.length;i++){
+      var sc=p.scenes[i],src=archiveFiles[sc.id] || sc.videoUrl;
+      v.pause();v.removeAttribute('src');v.load();v.src=src;v.currentTime=0;
+      await waitForEvent(v,'loadedmetadata');
+      try{await v.play();}catch(e){}
+      var start=performance.now(),dur=(sc.duration||4)*1000;
+      await new Promise(function(resolve){function frame(){var now=performance.now(),part=Math.min(1,(now-start)/dur);drawFrame(elapsed+part*(sc.duration||4),true);if(part>=1){resolve();return;}requestAnimationFrame(frame);}requestAnimationFrame(frame);});
+      elapsed+=(sc.duration||4);v.pause();
+    }
+    recorder.stop();await finished;
+    var blob=new Blob(chunks,{type:'video/webm'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='hark-history-'+(p.topic||'reel').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.webm';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},60000);
+    $("exportStatus").textContent='Export complete. Downloaded WebM video. Sound mixing and MP4 encoding are not included in this browser-only export.';toast('Final reel exported');
+  }catch(e){try{if(recorder.state!=='inactive')recorder.stop();}catch(_){} $("exportStatus").textContent='Export failed: '+(e.message||e);toast('Export failed — check selected clips and try again.');}
+  finally{btn.disabled=false;stream.getTracks().forEach(function(t){t.stop();});}
+});
+
 /* ================= Library ================= */
 function renderLibrary(){
   $("libCount").textContent = state.library.length;
@@ -832,5 +899,6 @@ document.querySelectorAll('input[name="preset"]').forEach(function(r){
   r.addEventListener("change", function(){ if(state.project){ state.project.preset = presetVal(); saveCur(); renderProject(); } });
 });
 </script>
-</body>
-</html>
+
+
+</body></html>
