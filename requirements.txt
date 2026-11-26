@@ -1,4 +1,4 @@
-# Hark History Studio — Local Backend
+# History Studio — Local Backend
 # Tested with Python 3.12.3 (any Python 3.11+ works).
 # Install:  .venv\Scripts\pip install -r requirements.txt   (Windows)
 #           .venv/bin/pip install -r requirements.txt       (Linux/macOS)
