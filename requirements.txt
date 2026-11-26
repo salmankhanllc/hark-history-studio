@@ -1,0 +1,14 @@
+# Hark History Studio — Local Backend
+# Tested with Python 3.12.3 (any Python 3.11+ works).
+# Install:  .venv\Scripts\pip install -r requirements.txt   (Windows)
+#           .venv/bin/pip install -r requirements.txt       (Linux/macOS)
+fastapi==0.165.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.4
+python-multipart==0.0.34
+pillow==13.0.0
+
+# Optional (NOT required by the core studio):
+#   piper-tts   — offline voiceovers. Install separately, see README:
+#                 .venv\Scripts\pip install piper-tts
+#   opencv-python — not needed; thumbnails and probing use FFmpeg/ffprobe.
