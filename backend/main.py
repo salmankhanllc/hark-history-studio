@@ -1,4 +1,4 @@
-"""Hark History Studio — local backend entry point.
+"""History Studio — local backend entry point.
 
 Run from the project root:
     python -m uvicorn backend.main:app --host 127.0.0.1 --port 8765
