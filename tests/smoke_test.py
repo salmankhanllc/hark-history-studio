@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke test for the Hark History Studio local backend.
+"""Smoke test for the History Studio local backend.
 
 Usage:  python tests/smoke_test.py [base_url] [clip1] [clip2]
 Defaults: base http://127.0.0.1:8765 and the two clips named in the test
