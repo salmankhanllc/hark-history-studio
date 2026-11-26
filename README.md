@@ -1,4 +1,4 @@
-# Hark History Studio — Local Backend Edition
+# History Studio — Local Backend Edition
 
 A fully local historical documentary video studio. It plans style-locked
 reels, organises your real archival footage, and renders true MP4 videos
@@ -17,7 +17,7 @@ included. Any Python 3.11+ works.
 
 ## Quick start (Windows)
 
-1. **Extract the zip first** into its own folder (e.g. `Documents\hark-history-studio-local`).
+1. **Extract the zip first** into its own folder (e.g. `Documents\history-studio-local`).
    Do NOT run anything from inside the zip.
 2. Double-click **`install.bat`** — once. It checks for a real Python,
    builds `.venv`, installs the dependencies, tries the optional Piper
